@@ -52,7 +52,7 @@
     'ig.btn': ['Instagramをフォローする', 'Follow on Instagram', 'Instagram 팔로우하기', '追蹤 Instagram'],
 
     'waza.title': ['人と技に目を向けたページ「わざのひと」', 'WAZANOHITO: a page about people and their craft', '사람과 기술에 주목한 페이지 ‘WAZANOHITO’', '關注人與技藝的頁面「WAZANOHITO」'],
-    'waza.p': ['ぐるりは、人と地域に目を向けたページです。人と技に目を向けたページが、「わざのひと」です。ひとつの技を長く磨いてきた方たちを、その技とともに紹介しています。', 'GURURI looks at people and their neighborhood. WAZANOHITO looks at people and their craft, introducing those who have long refined a single skill, together with that skill.', '구루리는 사람과 지역에 주목한 페이지입니다. 사람과 기술에 주목한 페이지가 ‘WAZANOHITO’입니다. 하나의 기술을 오랫동안 갈고닦아 온 분들을 그 기술과 함께 소개합니다.', 'GURURI 是關注人與地方的頁面。關注人與技藝的頁面則是「WAZANOHITO」，介紹長年磨練一項技藝的人們，以及他們的技藝。'],
+    'waza.p': ['ぐるりは、人と地域に目を向けたページです。人と技に目を向けたページが、「わざのひと」です。ひとつの技に向き合い続けている方たちを、その技とともに紹介しています。', 'GURURI looks at people and their neighborhood. WAZANOHITO looks at people and their craft, introducing people who keep devoting themselves to a single craft, together with that craft.', '구루리는 사람과 지역에 주목한 페이지입니다. 사람과 기술에 주목한 페이지가 ‘WAZANOHITO’입니다. 하나의 기술과 꾸준히 마주하고 있는 분들을 그 기술과 함께 소개합니다.', 'GURURI 是關注人與地方的頁面。關注人與技藝的頁面則是「WAZANOHITO」，介紹持續專注於一項技藝的人們，以及他們的技藝。'],
     'waza.btn': ['わざのひとを見る', 'See WAZANOHITO', 'WAZANOHITO 보기', '查看 WAZANOHITO'],
     'join.title': ['ぐるりへの掲載をご希望のお店の方へ', 'For shops interested in being featured on GURURI', '구루리 게재를 희망하시는 가게 분들께', '想刊登於 GURURI 的店家'],
     'join.btn': ['掲載について見る', 'Learn about listing', '게재 안내 보기', '查看刊登說明'],
