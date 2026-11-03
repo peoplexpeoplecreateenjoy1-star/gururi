@@ -68,7 +68,9 @@
         info: col(r, 'くわしい情報').split(/\n/).filter(Boolean), tag: col(r, 'タグ'),
         links: links,
         // 写真は1〜5枚。改行・カンマ・読点で区切って書く
-        photos: col(r, '写真').split(/[\n,、，]+/).map(function (p) { return p.trim(); }).filter(Boolean)
+        photos: col(r, '写真').split(/[\n,、，]+/).map(function (p) { return p.trim(); }).filter(Boolean),
+        // ページ冒頭の入れ替え用に選んだ写真（「トップの写真」の列）
+        top: col(r, 'トップの写真').split(/[\n,、，]+/).map(function (p) { return p.trim(); }).filter(Boolean)
       };
     });
   }
@@ -86,6 +88,23 @@
     if (/^https?:\/\//i.test(p)) return p;
     return 'photos/' + p.replace(/^\/?photos\//, '').split('/').map(encodeURIComponent).join('/');
   }
+
+  // Macからアップロードしたフォルダ名は、濁点・半濁点（ぺ・ブ など）が分かれた形で保存されることがある。
+  // シートに書いた名前で見つからなかったら、分かれた形の名前でもう一度探す。
+  function nfdSrc(src) {
+    try {
+      var d = decodeURIComponent(src), n = d.normalize('NFD');
+      if (n === d) return null;
+      return n.split('/').map(encodeURIComponent).join('/');
+    } catch (e) { return null; }
+  }
+  document.addEventListener('error', function (e) {
+    var t = e.target;
+    if (t && t.tagName === 'IMG' && !t.dataset.nfd) {
+      var alt = nfdSrc(t.getAttribute('src'));
+      if (alt) { t.dataset.nfd = '1'; t.src = alt; }
+    }
+  }, true);
 
   function card(s) {
     var st = STYLE[s.genre];
@@ -181,7 +200,7 @@
   });
 
 
-  // いちばん上の色のブロック：掲載店の写真と色のイラストを、市松模様で入れ替える
+  // いちばん上の色のブロック：「トップの写真」に選んだ写真と色のイラストを、市松模様で入れ替える
   // 同じお店の写真が同時に並ばないように選ぶ。約4秒ごと、少しずつずらしてふわっと切り替える
   var HERO_INTERVAL = 4000;
   function startHero() {
@@ -191,7 +210,8 @@
     var illus = tiles.map(function (t) {
       return { bg: t.style.background || t.style.backgroundColor, html: t.innerHTML };
     });
-    var pool = shops.filter(function (s) { return s.photos.length; });
+    // 「トップの写真」の列に書いた写真だけを使う（お店のカードの写真は使わない）
+    var pool = shops.filter(function (s) { return s.top.length; });
     if (!pool.length) return;
     tiles.forEach(function (t, i) {
       var layer = document.createElement('div');
@@ -246,7 +266,7 @@
             var src = shop.src;
             layer.style.background = STYLE[shop.shop.genre].bg;
             var img = new Image(); img.src = src; img.alt = ''; img.decoding = 'async';
-            img.onerror = function () { layer.innerHTML = illus[k++ % illus.length].html; };
+            img.onerror = function () { if (this.dataset.nfd === '1') { this.dataset.nfd = '2'; return; } layer.innerHTML = illus[k++ % illus.length].html; };
             layer.appendChild(img);
           } else {
             layer.style.background = ill.bg;
@@ -265,7 +285,7 @@
       var fresh = shuffle(pool.filter(function (s) { return shown.indexOf(s) < 0; }));
       var rest = shuffle(pool.filter(function (s) { return shown.indexOf(s) >= 0; }));
       return fresh.concat(rest).slice(0, count).map(function (sh) {
-        return { shop: sh, src: photoSrc(sh.photos[Math.floor(Math.random() * sh.photos.length)]) };
+        return { shop: sh, src: photoSrc(sh.top[Math.floor(Math.random() * sh.top.length)]) };
       });
     }
     function schedule(d) {
