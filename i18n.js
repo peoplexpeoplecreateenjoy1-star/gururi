@@ -99,6 +99,23 @@
     'くわしく見る': ['くわしく見る', 'Learn more', '자세히 보기', '查看詳情']
   };
 
+
+  // お店の名前の訳（シートに「店名_en」などがあれば、そちらが優先）。キーは日本語の店名（空白・改行を除いたもの）
+  var NAMES = {
+    '橋本商店': ['Hashimoto Shoten', '하시모토 상점', '橋本商店'],
+    'こはるびよりふぉとスタジオ': ['Koharubiyori Photo Studio', '코하루비요리 포토 스튜디오', 'Koharubiyori 照相館'],
+    'じびえ': ['Jibie', '지비에', 'Jibie'],
+    '墨庵ひばりがおか教室': ['Bokuan Calligraphy School, Hibarigaoka', '보쿠안 서예교실 히바리가오카', '墨庵 雲雀丘教室'],
+    '米粉パンの店コイガクボ保谷店': ['Koigakubo Rice Flour Bakery, Hoya', '쌀가루 빵집 코이가쿠보 호야점', '米粉麵包店 Koigakubo 保谷店'],
+    '正心道空手ひばりヶ丘道場': ['Seishindo Karate, Hibarigaoka Dojo', '세이신도 가라테 히바리가오카 도장', '正心道空手 雲雀丘道場'],
+    '100円レンタカー新座ひばりが丘店': ['100 Yen Rent-a-Car, Niiza Hibarigaoka', '100엔 렌터카 니자 히바리가오카점', '100日圓租車 新座雲雀丘店'],
+    '美容室マキシム': ['Hair Salon Maxime', '미용실 막심', '美容室 Maxime'],
+    'こんぺい陶': ['Konpeito', '곤페이토', 'Konpeito'],
+    'ブーランジェリー・ビアリッツ': ['Boulangerie Biarritz', '불랑제리 비아리츠', 'Boulangerie Biarritz'],
+    '手創りかばん工房クラクフ': ['Krakow Handmade Bag Studio', '수제 가방 공방 크라쿠프', '手作包包工坊 Krakow'],
+    '稲毛屋': ['Inageya', '이나게야', '稻毛屋']
+  };
+
   var IDX = { ja: 0, en: 1, ko: 2, zh: 3 };
   var KEY = 'gururi_lang';
 
@@ -120,6 +137,11 @@
     var s = row ? (row[IDX[lang]] || row[0]) : key;
     if (vars) Object.keys(vars).forEach(function (k) { s = s.split('{' + k + '}').join(vars[k]); });
     return s;
+  }
+  function shopName(ja) {
+    if (lang === 'ja') return '';
+    var row = NAMES[String(ja).replace(/\s+/g, '')];
+    return row ? row[IDX[lang] - 1] : '';
   }
   function word(w) {
     var row = WORDS[w];
@@ -152,7 +174,7 @@
 
   window.GURURI_I18N = {
     get lang() { return lang; },
-    t: t, word: word, set: set,
+    t: t, word: word, set: set, shopName: shopName,
     suffix: function () { return lang === 'ja' ? '' : '_' + lang; }
   };
 

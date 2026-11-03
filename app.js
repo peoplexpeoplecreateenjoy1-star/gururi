@@ -78,7 +78,7 @@
         map: col(r, '地図のURL'),
         // 英語・韓国語・中国語の訳（「紹介文_en」などの列）。空なら日本語のまま
         tr: ['en', 'ko', 'zh'].reduce(function (o, lg) {
-          o[lg] = { sub: col(r, 'サブ名_' + lg), kind: col(r, '種類_' + lg), text: col(r, '紹介文_' + lg), info: col(r, 'くわしい情報_' + lg) };
+          o[lg] = { name: col(r, '店名_' + lg), sub: col(r, 'サブ名_' + lg), kind: col(r, '種類_' + lg), text: col(r, '紹介文_' + lg), info: col(r, 'くわしい情報_' + lg) };
           return o;
         }, {})
       };
@@ -127,6 +127,10 @@
   function card(s) {
     var st = STYLE[s.genre];
     var sub = loc(s, 'sub'), kind = loc(s, 'kind'), text = loc(s, 'text');
+    // お店の名前：シートの「店名_en」など → i18n.js の訳 → 日本語のまま。訳したときは、元の名前を小さく添える（看板を探す手がかりに）
+    var lg = I18N.lang;
+    var nameTr = (lg !== 'ja' && s.tr && s.tr[lg] && s.tr[lg].name) || (I18N.shopName ? I18N.shopName(s.name) : '');
+    var shownName = nameTr || s.name;
     var infoTr = I18N.lang !== 'ja' && s.tr && s.tr[I18N.lang] ? s.tr[I18N.lang].info : '';
     var info = infoTr ? infoTr.split(/\n/).filter(Boolean) : s.info;
     var pic;
@@ -145,7 +149,8 @@
       ? '<a class="map-link" href="' + esc(mapUrl) + '" target="_blank" rel="noopener" aria-label="' + esc(T('map.aria', { name: s.name, city: W(s.city) })) + '">' + PIN + esc(W(s.city)) + '</a>'
       : '';
     h += '<p class="meta">' + esc(kind || W(s.genre)) + (place ? '｜' + place : '') + '</p>';
-    h += '<h3>' + esc(s.name) + '</h3>';
+    h += '<h3>' + esc(shownName) + '</h3>';
+    if (nameTr && nameTr !== s.name) h += '<p class="origname" lang="ja">' + esc(s.name) + '</p>';
     if (sub) h += '<p class="subname">' + esc(sub) + '</p>';
     if (text) h += '<p class="text">' + esc(text) + '</p>';
     if (info.length) h += '<ul class="info">' + info.map(function (l) { return '<li>' + esc(l) + '</li>'; }).join('') + '</ul>';

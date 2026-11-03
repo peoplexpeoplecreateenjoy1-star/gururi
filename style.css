@@ -192,3 +192,4 @@ html[lang="zh-Hant"]{--maru:'PingFang TC','Noto Sans TC','Microsoft JhengHei',sa
 .nav{margin-left:auto}
 
 @media (max-width:720px){.lang{order:2;margin-left:auto}.nav{order:3;flex-basis:100%;margin-left:0}}
+.origname{margin-top:-6px;font-size:13px;color:var(--sub);font-family:var(--kaku)}
