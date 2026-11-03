@@ -40,7 +40,7 @@ p{margin:0}
 .tile-layer img{width:100%;height:100%;object-fit:cover}
 @media (prefers-reduced-motion:reduce){.tile-layer{transition:none;transform:none}}
 .hero-copy{position:absolute;inset:0;display:flex;align-items:center;justify-content:center;padding:16px;pointer-events:none}
-.hero-copy h1{background:var(--kinari);font-size:clamp(20px,3vw,40px);line-height:1.5;letter-spacing:.1em;padding:.55em 1.1em;border-radius:999px;text-align:center}
+.hero-copy h1{background:rgba(247,242,234,.72);-webkit-backdrop-filter:blur(2px);backdrop-filter:blur(2px);font-size:clamp(20px,3vw,40px);line-height:1.5;letter-spacing:.1em;padding:.55em 1.1em;border-radius:999px;text-align:center}
 
 /* icon strip */
 .strip{background:var(--beige);padding:18px 0;overflow:hidden}
