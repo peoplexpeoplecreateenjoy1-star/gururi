@@ -66,7 +66,9 @@
         name: col(r, '店名'), sub: col(r, 'サブ名'), genre: STYLE[genre] ? genre : '暮らし',
         kind: col(r, '種類'), city: col(r, '市'), text: col(r, '紹介文'),
         info: col(r, 'くわしい情報').split(/\n/).filter(Boolean), tag: col(r, 'タグ'),
-        links: links, photo: col(r, '写真')
+        links: links,
+        // 写真は1〜5枚。改行・カンマ・読点で区切って書く
+        photos: col(r, '写真').split(/[\n,、，]+/).map(function (p) { return p.trim(); }).filter(Boolean)
       };
     });
   }
@@ -77,14 +79,26 @@
     });
   }
   function safeUrl(u) { return /^(https?:)?\/\//i.test(u) ? u : '#'; }
-  function photoSrc(p) { return /^https?:\/\//i.test(p) ? p : 'photos/' + p; }
+  function photoSrc(p) {
+    // GitHubのファイル画面のURL（…/blob/main/photos/…）を貼っても表示できるようにする
+    var gh = p.match(/github\.com\/[^/]+\/[^/]+\/blob\/[^/]+\/photos\/(.+)$/i);
+    if (gh) return 'photos/' + gh[1];
+    if (/^https?:\/\//i.test(p)) return p;
+    return 'photos/' + p.replace(/^\/?photos\//, '').split('/').map(encodeURIComponent).join('/');
+  }
 
   function card(s) {
     var st = STYLE[s.genre];
-    var pic = s.photo
-      ? '<img src="' + esc(photoSrc(s.photo)) + '" alt="' + esc(s.name) + 'の写真" loading="lazy">'
-      : '<svg viewBox="0 0 24 24" fill="none" stroke="' + st.fg + '" stroke-width="1.3" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">' + ICONS[st.icon] + '</svg>';
-    var h = '<article class="card"><div class="card-pic" style="background:' + st.bg + '">' + pic + '</div><div class="card-body">';
+    var pic;
+    if (!s.photos.length) {
+      pic = '<svg viewBox="0 0 24 24" fill="none" stroke="' + st.fg + '" stroke-width="1.3" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">' + ICONS[st.icon] + '</svg>';
+    } else {
+      var n = s.photos.length;
+      pic = s.photos.map(function (p, i) {
+        return '<img class="slide' + (i === 0 ? ' is-on' : '') + '" src="' + esc(photoSrc(p)) + '" alt="' + esc(s.name) + 'の写真' + (n > 1 ? '（' + (i + 1) + '/' + n + '）' : '') + '"' + (i === 0 ? '' : ' aria-hidden="true"') + ' loading="lazy">';
+      }).join('');
+    }
+    var h = '<article class="card"><div class="card-pic' + (s.photos.length > 1 ? ' is-slider' : '') + '" style="background:' + st.bg + '">' + pic + '</div><div class="card-body">';
     h += '<p class="meta">' + esc(s.kind || s.genre) + (s.city ? '｜' + esc(s.city) : '') + '</p>';
     h += '<h3>' + esc(s.name) + '</h3>';
     if (s.sub) h += '<p class="subname">' + esc(s.sub) + '</p>';
@@ -121,9 +135,50 @@
       return (state.genre === 'all' || s.genre === state.genre) && (state.area === 'all' || s.city === state.area);
     });
     grid.innerHTML = list.map(card).join('');
+    setupSliders();
     document.getElementById('shop-count').textContent = list.length + '軒のお店（全' + shops.length + '軒）';
     document.getElementById('shop-empty').hidden = list.length > 0;
   }
+
+  // 写真の切り替え（約4秒ごとに、ゆっくり重ねるように切り替える。カードごとに少しずつずらす）
+  var INTERVAL = 4500;
+  var sliders = [];
+  var reduceMotion = window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+
+  function setupSliders() {
+    sliders.forEach(function (sl) { clearTimeout(sl.timer); if (sl.io) sl.io.disconnect(); });
+    sliders = [];
+    grid.querySelectorAll('.card-pic.is-slider').forEach(function (box, idx) {
+      var imgs = box.querySelectorAll('.slide');
+      var sl = { i: 0, timer: null, visible: false, io: null };
+      function show(k) {
+        var prev = sl.i;
+        sl.i = (k + imgs.length) % imgs.length;
+        imgs.forEach(function (im, j) {
+          im.classList.toggle('is-prev', j === prev && j !== sl.i);
+          im.classList.toggle('is-on', j === sl.i);
+          if (j === sl.i) im.removeAttribute('aria-hidden'); else im.setAttribute('aria-hidden', 'true');
+        });
+      }
+      function schedule(delay) {
+        clearTimeout(sl.timer);
+        if (reduceMotion || !sl.visible || document.hidden) return;
+        sl.timer = setTimeout(function () { show(sl.i + 1); schedule(INTERVAL); }, delay);
+      }
+      sl.schedule = schedule;
+      if ('IntersectionObserver' in window) {
+        sl.io = new IntersectionObserver(function (es) {
+          sl.visible = es[0].isIntersecting;
+          if (sl.visible) schedule(INTERVAL + (idx % 5) * 700); else clearTimeout(sl.timer);
+        }, { threshold: 0.4 });
+        sl.io.observe(box);
+      } else { sl.visible = true; schedule(INTERVAL + (idx % 5) * 700); }
+      sliders.push(sl);
+    });
+  }
+  document.addEventListener('visibilitychange', function () {
+    sliders.forEach(function (sl) { if (document.hidden) clearTimeout(sl.timer); else sl.schedule(INTERVAL); });
+  });
 
   function load(url) {
     return fetch(url, { cache: 'no-store' }).then(function (r) {
