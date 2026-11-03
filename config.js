@@ -6,7 +6,7 @@
 window.GURURI_CONFIG = {
   // スプレッドシートを「ウェブに公開（CSV）」したときのURL。
   // 空のままだと、data/shops.csv の内容が表示されます。
-  sheetCsvUrl: "",
+  sheetCsvUrl: "https://docs.google.com/spreadsheets/d/e/2PACX-1vTb4L2OZSQFfu-RAwg1j-pEgIUCoQcEVFIwc9Fb_vnci79DRBBWNEHPAe5cbQke9Hi3ruHSx_Z0ez3x/pub?gid=1209506581&single=true&output=csv",
 
   // 各ボタンのリンク先
   instagram: "https://www.instagram.com/torimich73/",
