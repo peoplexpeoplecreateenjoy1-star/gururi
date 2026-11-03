@@ -117,7 +117,7 @@ p{margin:0}
 .ft small{display:block;max-width:1200px;margin:28px auto 0;font-size:12px;color:#D9CDBE}
 
 /* concept page */
-.c-hero{position:relative;background:var(--sky);overflow:hidden}
+.c-hero{position:relative;overflow:hidden;background:linear-gradient(rgba(247,242,234,.78),rgba(247,242,234,.78)),url("assets/bg/concept-hero.jpg") center 60%/cover no-repeat,var(--kinari)}
 .cloud{position:absolute;border-radius:999px;background:var(--kinari);opacity:.85}
 .c-hero-in{position:relative;max-width:1100px;margin:0 auto;padding:96px 24px 40px;display:flex;flex-wrap:wrap;gap:40px 80px;align-items:center;justify-content:center}
 .c-hero h1{height:480px;font-size:46px;line-height:1.6;letter-spacing:.2em}
@@ -138,7 +138,7 @@ p{margin:0}
 .vnum{display:block;font-family:var(--maru);font-weight:900;font-size:22px;color:var(--orange);letter-spacing:.06em;margin-bottom:6px}
 .vcard h3{font-size:21px;letter-spacing:.08em;margin-bottom:10px}
 .vcard p{font-size:15px;line-height:2}
-.view{background:var(--beige);padding:72px 24px 88px;position:relative;overflow:hidden}
+.view{background:linear-gradient(rgba(239,232,228,.8),rgba(239,232,228,.8)),url("assets/bg/concept-view.jpg") center/cover no-repeat,var(--beige);padding:72px 24px 88px;position:relative;overflow:hidden}
 .blob{position:absolute;border-radius:50%;background:var(--kinari)}
 .view-in{position:relative;max-width:960px;margin:0 auto;display:flex;flex-wrap:wrap-reverse;gap:40px 72px;align-items:flex-start;justify-content:center}
 .view-tx{height:480px;font-size:18px;line-height:2.4;letter-spacing:.16em}
