@@ -33,8 +33,12 @@ p{margin:0}
 /* hero tiles (list page) */
 .hero{position:relative}
 .tiles{display:grid;grid-template-columns:repeat(3,minmax(0,1fr))}
-.tile{aspect-ratio:4/3;display:flex;align-items:center;justify-content:center}
+.tile{aspect-ratio:4/3;display:flex;align-items:center;justify-content:center;position:relative;overflow:hidden}
 .tile svg{width:40%;height:auto}
+.tile-layer{position:absolute;inset:0;display:flex;align-items:center;justify-content:center;opacity:0;transform:scale(1.05);transition:opacity .9s ease,transform 1.8s ease}
+.tile-layer.is-on{opacity:1;transform:scale(1)}
+.tile-layer img{width:100%;height:100%;object-fit:cover}
+@media (prefers-reduced-motion:reduce){.tile-layer{transition:none;transform:none}}
 .hero-copy{position:absolute;inset:0;display:flex;align-items:center;justify-content:center;padding:16px;pointer-events:none}
 .hero-copy h1{background:var(--kinari);font-size:clamp(20px,3vw,40px);line-height:1.5;letter-spacing:.1em;padding:.55em 1.1em;border-radius:999px;text-align:center}
 

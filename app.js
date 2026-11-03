@@ -180,6 +180,109 @@
     sliders.forEach(function (sl) { if (document.hidden) clearTimeout(sl.timer); else sl.schedule(INTERVAL); });
   });
 
+
+  // いちばん上の色のブロック：掲載店の写真と色のイラストを、市松模様で入れ替える
+  // 同じお店の写真が同時に並ばないように選ぶ。約4秒ごと、少しずつずらしてふわっと切り替える
+  var HERO_INTERVAL = 4000;
+  function startHero() {
+    var wrap = document.querySelector('.tiles');
+    if (!wrap) return;
+    var tiles = [].slice.call(wrap.querySelectorAll('.tile'));
+    var illus = tiles.map(function (t) {
+      return { bg: t.style.background || t.style.backgroundColor, html: t.innerHTML };
+    });
+    var pool = shops.filter(function (s) { return s.photos.length; });
+    if (!pool.length) return;
+    tiles.forEach(function (t, i) {
+      var layer = document.createElement('div');
+      layer.className = 'tile-layer is-on';
+      layer.style.background = illus[i].bg;
+      layer.innerHTML = illus[i].html;
+      t.innerHTML = ''; t.style.background = '';
+      t.appendChild(layer);
+    });
+    var cycle = 0, shown = [], next = null, timer = null, visible = true;
+
+    function shuffle(a) {
+      a = a.slice();
+      for (var i = a.length - 1; i > 0; i--) { var j = Math.floor(Math.random() * (i + 1)); var x = a[i]; a[i] = a[j]; a[j] = x; }
+      return a;
+    }
+    function photoSlots() {
+      var cols = getComputedStyle(wrap).gridTemplateColumns.split(' ').length || 3;
+      var out = [];
+      tiles.forEach(function (t, i) {
+        var r = Math.floor(i / cols), c = i % cols;
+        if ((r + c + cycle) % 2 === 0) out.push(i);
+      });
+      return out;
+    }
+    function swap(i, makeLayer, delay) {
+      setTimeout(function () {
+        var t = tiles[i];
+        var old = [].slice.call(t.querySelectorAll('.tile-layer'));
+        var layer = makeLayer();
+        t.appendChild(layer);
+        requestAnimationFrame(function () { requestAnimationFrame(function () { layer.classList.add('is-on'); }); });
+        setTimeout(function () { old.forEach(function (o) { o.remove(); }); }, 1900);
+      }, delay);
+    }
+    function step() {
+      var slots = photoSlots();
+      var picks = next || plan(slots.length);
+      shown = picks.map(function (x) { return x.shop; });
+      next = null;
+      var illOrder = shuffle(illus);
+      var order = shuffle(tiles.map(function (t, i) { return i; }));
+      var k = 0, n = 0;
+      order.forEach(function (i, idx) {
+        var slot = slots.indexOf(i);
+        var shop = slot >= 0 ? picks[slot] : null;
+        var ill = shop ? null : illOrder[n++ % illOrder.length];
+        swap(i, function () {
+          var layer = document.createElement('div');
+          layer.className = 'tile-layer';
+          if (shop) {
+            var src = shop.src;
+            layer.style.background = STYLE[shop.shop.genre].bg;
+            var img = new Image(); img.src = src; img.alt = ''; img.decoding = 'async';
+            img.onerror = function () { layer.innerHTML = illus[k++ % illus.length].html; };
+            layer.appendChild(img);
+          } else {
+            layer.style.background = ill.bg;
+            layer.innerHTML = ill.html;
+          }
+          return layer;
+        }, idx * 140);
+      });
+      cycle++;
+      // 次に出す写真だけを先に読み込んでおく（全部を一度に読み込まない）
+      next = plan(photoSlots().length);
+      next.forEach(function (x) { var im = new Image(); im.src = x.src; });
+    }
+    // いま並んでいるお店を避けて、同じお店が重ならないように選ぶ
+    function plan(count) {
+      var fresh = shuffle(pool.filter(function (s) { return shown.indexOf(s) < 0; }));
+      var rest = shuffle(pool.filter(function (s) { return shown.indexOf(s) >= 0; }));
+      return fresh.concat(rest).slice(0, count).map(function (sh) {
+        return { shop: sh, src: photoSrc(sh.photos[Math.floor(Math.random() * sh.photos.length)]) };
+      });
+    }
+    function schedule(d) {
+      clearTimeout(timer);
+      if (reduceMotion || !visible || document.hidden) return;
+      timer = setTimeout(function () { step(); schedule(HERO_INTERVAL); }, d);
+    }
+    step();
+    if ('IntersectionObserver' in window) {
+      new IntersectionObserver(function (es) {
+        visible = es[0].isIntersecting;
+        if (visible) schedule(HERO_INTERVAL); else clearTimeout(timer);
+      }, { threshold: 0.2 }).observe(wrap);
+    } else schedule(HERO_INTERVAL);
+    document.addEventListener('visibilitychange', function () { if (document.hidden) clearTimeout(timer); else schedule(HERO_INTERVAL); });
+  }
+
   function load(url) {
     return fetch(url, { cache: 'no-store' }).then(function (r) {
       if (!r.ok) throw new Error(r.status);
@@ -193,6 +296,7 @@
       shops = toShops(parseCSV(text));
       document.getElementById('shop-loading').hidden = true;
       render();
+      startHero();
     })
     .catch(function () {
       document.getElementById('shop-loading').textContent = 'お店の情報を読み込めませんでした。時間をおいて、もう一度開いてみてください。';
