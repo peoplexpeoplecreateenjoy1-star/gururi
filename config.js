@@ -10,7 +10,7 @@ window.GURURI_CONFIG = {
 
   // 各ボタンのリンク先
   instagram: "https://www.instagram.com/torimich73/",
-  wazanohito: "https://sites.google.com/view/torimich",
+  wazanohito: "https://www.torimich.com/ambassador",
   joinForm: "https://docs.google.com/forms/d/e/1FAIpQLSfUggRPA2s2wEhYJEuyCPymmmWzcLFDMaeBQZNSrIWbhR-jEQ/viewform",
   torimichHome: "https://sites.google.com/view/torimich"
 };
