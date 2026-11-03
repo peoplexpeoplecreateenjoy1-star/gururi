@@ -12,19 +12,20 @@
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Zen+Maru+Gothic:wght@500;700;900&family=Zen+Kaku+Gothic+New:wght@400;500;700&display=swap">
-<link rel="stylesheet" href="style.css?v=20261103i">
+<link rel="stylesheet" href="style.css?v=20261103j">
 </head>
-<body>
+<body data-page="concept">
 
 <header class="hd">
 <div class="hd-in">
-<a class="brand" href="index.html"><img src="assets/logo.svg" alt="ぐるり" width="84" height="40"></a>
-<nav class="nav" aria-label="ぐるりのメニュー">
-<a href="index.html">お店をさがす</a>
-<a href="concept.html" aria-current="page">ぐるりについて</a>
-<a href="#" data-link="wazanohito">わざのひと</a>
-<a href="#" data-link="joinForm">掲載について</a>
+<a class="brand" href="index.html"><img src="assets/logo.svg" data-logo="color" alt="ぐるり" data-i18n-alt="brand" width="84" height="40"></a>
+<nav class="nav" aria-label="ぐるりのメニュー" data-i18n-aria="nav.menu">
+<a href="index.html" data-i18n="nav.shops">お店をさがす</a>
+<a href="concept.html" aria-current="page" data-i18n="nav.about">ぐるりについて</a>
+<a href="#" data-link="wazanohito" data-i18n="nav.waza">わざのひと</a>
+<a href="#" data-link="joinForm" data-i18n="nav.join">掲載について</a>
 </nav>
+<label class="lang"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="9"/><path d="M3 12h18M12 3c2.5 2.6 3.8 5.6 3.8 9s-1.3 6.4-3.8 9c-2.5-2.6-3.8-5.6-3.8-9S9.5 5.6 12 3z"/></svg><span class="sr-only" data-i18n="lang.label">言語</span><select class="lang-select"><option value="ja">日本語</option></select></label>
 </div>
 </header>
 
@@ -34,11 +35,11 @@
 <div class="cloud" aria-hidden="true" style="top:120px;left:14%;width:120px;height:40px;opacity:.7"></div>
 <div class="cloud" aria-hidden="true" style="top:70px;right:8%;width:260px;height:80px"></div>
 <div class="c-hero-in">
-<h1 id="c-hero-title" class="vert vert-sp">いつもの道に、<br>寄り道をひとつ。</h1>
+<h1 id="c-hero-title" class="vert vert-sp" data-i18n="c.hero">いつもの道に、<br>寄り道をひとつ。</h1>
 <div class="c-lead">
-<img src="assets/logo.svg" alt="ぐるり" width="240" height="115">
-<p>毎日通る道にも、まだ扉を開けたことのないお店があります。</p>
-<p>ぐるりは、そんなお店をひとつずつ紹介しているページです。</p>
+<img src="assets/logo.svg" data-logo="color" alt="ぐるり" data-i18n-alt="brand" width="240" height="115">
+<p data-i18n="c.lead1">毎日通る道にも、まだ扉を開けたことのないお店があります。</p>
+<p data-i18n="c.lead2">ぐるりは、そんなお店をひとつずつ紹介しているページです。</p>
 </div>
 </div>
 <svg class="hills" aria-hidden="true" viewBox="0 0 1440 160" preserveAspectRatio="none"><path d="M0,120 L180,52 L300,96 L470,24 L640,100 L760,64 L930,118 L1100,40 L1260,92 L1440,58 L1440,160 L0,160 Z" fill="#B9D3C2"/><path d="M0,138 C200,96 380,150 620,118 S1040,92 1240,128 1380,124 1440,116 L1440,160 L0,160 Z" fill="#F7F2EA"/></svg>
@@ -60,17 +61,17 @@
 </div></div>
 
 <section class="values" aria-labelledby="values-title">
-<h2 id="values-title" class="sec-title">ぐるりが大切にしていること</h2>
+<h2 id="values-title" class="sec-title" data-i18n="c.values">ぐるりが大切にしていること</h2>
 <p class="dots" aria-hidden="true"><span style="background:#D46A3C"></span><span style="background:#5E9A4E;margin-top:-8px"></span></p>
 <div class="vgrid">
 <article class="vcard">
-<div class="vcard-body"><b class="vnum">01</b><h3>お店の方の言葉で</h3><p>紹介文は、お店の方からいただいた言葉をそのまま載せています。店先で少しお話を聞くような気持ちで、読んでみてください。</p></div>
+<div class="vcard-body"><b class="vnum">01</b><h3 data-i18n="v1.h">お店の方の言葉で</h3><p data-i18n="v1.p">紹介文は、お店の方からいただいた言葉をそのまま載せています。店先で少しお話を聞くような気持ちで、読んでみてください。</p></div>
 </article>
 <article class="vcard">
-<div class="vcard-body"><b class="vnum">02</b><h3>毎月、すこしずつ新しく</h3><p>お店の情報は毎月更新し、あたらしく加わったお店もご紹介しています。</p></div>
+<div class="vcard-body"><b class="vnum">02</b><h3 data-i18n="v2.h">毎月、すこしずつ新しく</h3><p data-i18n="v2.p">お店の情報は毎月更新し、あたらしく加わったお店もご紹介しています。</p></div>
 </article>
 <article class="vcard">
-<div class="vcard-body"><b class="vnum">03</b><h3>垣根をこえて、となりに</h3><p>カフェのとなりに、かばん屋さん。花屋さんのとなりに、フォトスタジオ。業種や市の境目にとらわれず、近くの気になるお店を並べています。</p></div>
+<div class="vcard-body"><b class="vnum">03</b><h3 data-i18n="v3.h">垣根をこえて、となりに</h3><p data-i18n="v3.p">カフェのとなりに、かばん屋さん。花屋さんのとなりに、フォトスタジオ。業種や市の境目にとらわれず、近くの気になるお店を並べています。</p></div>
 </article>
 </div>
 </section>
@@ -81,62 +82,63 @@
 <div class="blob" aria-hidden="true" style="bottom:40px;right:-40px;width:300px;height:180px"></div>
 <div class="view-in">
 <div class="view-tx vert vert-sp">
-<p>訪れた方が、心から楽しんでくださること。</p>
-<p>その時間が、お店の力になり、</p>
-<p>まちの潤いにつながっていくこと。</p>
-<p>ぐるりが目指しているのは、そんな景色です。</p>
+<p data-i18n="view.p1">訪れた方が、心から楽しんでくださること。</p>
+<p data-i18n="view.p2">その時間が、お店の力になり、</p>
+<p data-i18n="view.p3">まちの潤いにつながっていくこと。</p>
+<p data-i18n="view.p4">ぐるりが目指しているのは、そんな景色です。</p>
 </div>
-<h2 id="view-title" class="vert vert-sp">目指している景色</h2>
+<h2 id="view-title" class="vert vert-sp" data-i18n="view.h">目指している景色</h2>
 </div>
 </section>
 <svg class="wave" aria-hidden="true" viewBox="0 0 1440 60" preserveAspectRatio="none" style="background:#EFE8E4"><path d="M0,30 C180,58 360,4 560,28 S900,58 1100,30 1340,4 1440,24 L1440,60 L0,60 Z" fill="#F7F2EA"/></svg>
 
 <section class="next" aria-labelledby="next-title">
-<h2 id="next-title" class="sec-title">これから</h2>
+<h2 id="next-title" class="sec-title" data-i18n="next.h">これから</h2>
 <div class="next-tx">
-<p>はじまりは、ひばりが丘から。</p>
-<p>これから少しずつ、西武線沿線のまちへも広げていきます。</p>
-<p>地域の学校やお店と一緒に、まちで過ごす時間がもっと楽しくなる企画も考えています。</p>
+<p data-i18n="next.p1">はじまりは、ひばりが丘から。</p>
+<p data-i18n="next.p2">これから少しずつ、西武線沿線のまちへも広げていきます。</p>
+<p data-i18n="next.p3">地域の学校やお店と一緒に、まちで過ごす時間がもっと楽しくなる企画も考えています。</p>
 </div>
 </section>
 
 <section class="cta" aria-labelledby="cta-title">
 <div class="cta-in">
-<h2 id="cta-title">気になるお店が見つかったら、<br>いつもの道の途中で、ふらりと寄ってみてください。</h2>
-<a class="btn btn-kinari" href="index.html">ぐるりを見る<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 12h14M13 6l6 6-6 6"/></svg></a>
+<h2 id="cta-title" data-i18n="cta.h">気になるお店が見つかったら、<br>いつもの道の途中で、ふらりと寄ってみてください。</h2>
+<a class="btn btn-kinari" href="index.html"><span data-i18n="cta.btn">ぐるりを見る</span><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 12h14M13 6l6 6-6 6"/></svg></a>
 </div>
 </section>
 
 <section class="band-waza solo" aria-labelledby="waza-title">
 <div class="waza">
-<div class="waza-ic"><img src="assets/wazanohito.png" alt="わざのひと" width="120" height="120"></div>
+<div class="waza-ic"><img src="assets/wazanohito.png" alt="わざのひと" data-i18n-alt="nav.waza" width="120" height="120"></div>
 <div class="waza-tx">
-<h2 id="waza-title">人と技に目を向けたページ「わざのひと」</h2>
-<p>ぐるりは、人と地域に目を向けたページです。人と技に目を向けたページが、「わざのひと」です。ひとつの技を長く磨いてきた方たちを、その技とともに紹介しています。</p>
+<h2 id="waza-title" data-i18n="waza.title">人と技に目を向けたページ「わざのひと」</h2>
+<p data-i18n="waza.p">ぐるりは、人と地域に目を向けたページです。人と技に目を向けたページが、「わざのひと」です。ひとつの技を長く磨いてきた方たちを、その技とともに紹介しています。</p>
 </div>
-<a class="btn" href="#" data-link="wazanohito">わざのひとを見る<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 12h14M13 6l6 6-6 6"/></svg></a>
+<a class="btn" href="#" data-link="wazanohito"><span data-i18n="waza.btn">わざのひとを見る</span><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 12h14M13 6l6 6-6 6"/></svg></a>
 </div>
 </section>
 
 <section class="join" aria-labelledby="join-title">
-<h2 id="join-title">ぐるりへの掲載をご希望のお店の方へ</h2>
-<a class="btn btn-line" href="#" data-link="joinForm">掲載について見る<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 12h14M13 6l6 6-6 6"/></svg></a>
+<h2 id="join-title" data-i18n="join.title">ぐるりへの掲載をご希望のお店の方へ</h2>
+<a class="btn btn-line" href="#" data-link="joinForm"><span data-i18n="join.btn">掲載について見る</span><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 12h14M13 6l6 6-6 6"/></svg></a>
 </section>
 </main>
 
 <footer class="ft">
 <div class="ft-in">
-<img src="assets/logo-white.svg" alt="ぐるり" width="92" height="44">
-<nav aria-label="フッター">
-<a href="#" data-link="torimichHome">通り道（TORIMICH）</a>
-<a href="index.html">お店をさがす</a>
-<a href="#" data-link="joinForm">掲載について</a>
+<img src="assets/logo-white.svg" data-logo="white" alt="ぐるり" data-i18n-alt="brand" width="92" height="44">
+<nav aria-label="フッター" data-i18n-aria="nav.footer">
+<a href="#" data-link="torimichHome" data-i18n="nav.torimich">通り道（TORIMICH）</a>
+<a href="index.html" data-i18n="nav.shops">お店をさがす</a>
+<a href="#" data-link="joinForm" data-i18n="nav.join">掲載について</a>
 </nav>
 </div>
 <small>© 2026 TORIMICH. All Rights Reserved.</small>
 </footer>
 
-<script src="config.js?v=20261103i"></script>
-<script src="app.js?v=20261103i"></script>
+<script src="config.js?v=20261103j"></script>
+<script src="i18n.js?v=20261103j"></script>
+<script src="app.js?v=20261103j"></script>
 </body>
 </html>

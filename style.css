@@ -168,3 +168,27 @@ p{margin:0}
   .route .stop span:last-child{font-size:13px}
   .waza{padding:28px}
 }
+
+/* language switcher */
+.sr-only{position:absolute;width:1px;height:1px;padding:0;margin:-1px;overflow:hidden;clip:rect(0,0,0,0);white-space:nowrap;border:0}
+.lang{position:relative;display:inline-flex;align-items:center;gap:6px;min-height:44px;padding:0 14px 0 12px;border:1.5px solid #D6C8B4;border-radius:999px;background:#fff;color:var(--ink);cursor:pointer}
+.lang svg{width:18px;height:18px;flex:0 0 auto;pointer-events:none}
+.lang-select{appearance:none;-webkit-appearance:none;border:0;background:transparent;font-family:var(--maru);font-weight:700;font-size:14px;color:var(--ink);padding:10px 16px 10px 0;cursor:pointer;background-image:linear-gradient(45deg,transparent 50%,currentColor 50%),linear-gradient(135deg,currentColor 50%,transparent 50%);background-position:right 4px center,right 0 center;background-size:4px 4px,4px 4px;background-repeat:no-repeat}
+.lang-select:focus{outline:none}
+.lang:focus-within{outline:3px solid var(--green);outline-offset:2px}
+.hd-in{gap:12px 20px}
+.mt-note{margin:-12px 0 20px;font-size:13px;color:var(--sub)}
+
+/* 日本語以外：縦書きをやめる・書体を各言語向けに */
+html:not([lang="ja"]) .vert{writing-mode:horizontal-tb;height:auto !important}
+html:not([lang="ja"]) .hero-copy h1{white-space:normal;letter-spacing:.03em}
+html:not([lang="ja"]) h1,html:not([lang="ja"]) h2,html:not([lang="ja"]) h3{letter-spacing:.02em}
+html:not([lang="ja"]) .view-in{flex-direction:column-reverse;align-items:center;text-align:center}
+html:not([lang="ja"]) .view-tx p:last-child{margin-right:0}
+html:not([lang="ja"]) .c-hero h1{max-width:520px;font-size:clamp(28px,4vw,44px)}
+html:not([lang="ja"]) .intro h2{max-width:480px;font-size:28px}
+html[lang="ko"]{--maru:'Apple SD Gothic Neo','Noto Sans KR','Malgun Gothic',sans-serif;--kaku:'Apple SD Gothic Neo','Noto Sans KR','Malgun Gothic',sans-serif}
+html[lang="zh-Hant"]{--maru:'PingFang TC','Noto Sans TC','Microsoft JhengHei',sans-serif;--kaku:'PingFang TC','Noto Sans TC','Microsoft JhengHei',sans-serif}
+.nav{margin-left:auto}
+
+@media (max-width:720px){.lang{order:2;margin-left:auto}.nav{order:3;flex-basis:100%;margin-left:0}}

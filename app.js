@@ -1,5 +1,8 @@
 (function () {
   var CFG = window.GURURI_CONFIG || {};
+  var I18N = window.GURURI_I18N || { lang: 'ja', t: function (k) { return k; }, word: function (w) { return w; } };
+  function T(k, v) { return I18N.t(k, v); }
+  function W(w) { return I18N.word(w); }
 
   // config.js のリンク先を、data-link="..." のついたリンクに入れる
   document.querySelectorAll('[data-link]').forEach(function (a) {
@@ -72,7 +75,12 @@
         // ページ冒頭の入れ替え用に選んだ写真（「トップの写真」の列）
         top: col(r, 'トップの写真').split(/[\n,、，]+/).map(function (p) { return p.trim(); }).filter(Boolean),
         // お店の場所（Googleマップ）。「地図のURL」の列が空なら、店名で地図を検索するリンクにする
-        map: col(r, '地図のURL')
+        map: col(r, '地図のURL'),
+        // 英語・韓国語・中国語の訳（「紹介文_en」などの列）。空なら日本語のまま
+        tr: ['en', 'ko', 'zh'].reduce(function (o, lg) {
+          o[lg] = { sub: col(r, 'サブ名_' + lg), kind: col(r, '種類_' + lg), text: col(r, '紹介文_' + lg), info: col(r, 'くわしい情報_' + lg) };
+          return o;
+        }, {})
       };
     });
   }
@@ -110,43 +118,52 @@
 
   var PIN = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 21s-6.5-5.6-6.5-11a6.5 6.5 0 0 1 13 0c0 5.4-6.5 11-6.5 11z"/><circle cx="12" cy="10" r="2.3"/></svg>';
 
+  // いまの言語の訳があれば使い、なければ日本語
+  function loc(s, field) {
+    var lg = I18N.lang, v = lg !== 'ja' && s.tr && s.tr[lg] ? s.tr[lg][field] : '';
+    return v || s[field];
+  }
+
   function card(s) {
     var st = STYLE[s.genre];
+    var sub = loc(s, 'sub'), kind = loc(s, 'kind'), text = loc(s, 'text');
+    var infoTr = I18N.lang !== 'ja' && s.tr && s.tr[I18N.lang] ? s.tr[I18N.lang].info : '';
+    var info = infoTr ? infoTr.split(/\n/).filter(Boolean) : s.info;
     var pic;
     if (!s.photos.length) {
       pic = '<svg viewBox="0 0 24 24" fill="none" stroke="' + st.fg + '" stroke-width="1.3" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">' + ICONS[st.icon] + '</svg>';
     } else {
       var n = s.photos.length;
       pic = s.photos.map(function (p, i) {
-        return '<img class="slide' + (i === 0 ? ' is-on' : '') + '" src="' + esc(photoSrc(p)) + '" alt="' + esc(s.name) + 'の写真' + (n > 1 ? '（' + (i + 1) + '/' + n + '）' : '') + '"' + (i === 0 ? '' : ' aria-hidden="true"') + ' loading="lazy">';
+        return '<img class="slide' + (i === 0 ? ' is-on' : '') + '" src="' + esc(photoSrc(p)) + '" alt="' + esc(T('photo.alt', { name: s.name })) + (n > 1 ? ' (' + (i + 1) + '/' + n + ')' : '') + '"' + (i === 0 ? '' : ' aria-hidden="true"') + ' loading="lazy">';
       }).join('');
     }
     var h = '<article class="card"><div class="card-pic' + (s.photos.length > 1 ? ' is-slider' : '') + '" style="background:' + st.bg + '">' + pic + '</div><div class="card-body">';
     var mapUrl = /^https?:\/\//i.test(s.map) ? s.map
       : 'https://www.google.com/maps/search/?api=1&query=' + encodeURIComponent([s.name, s.sub, s.city].filter(Boolean).join(' '));
     var place = s.city
-      ? '<a class="map-link" href="' + esc(mapUrl) + '" target="_blank" rel="noopener" aria-label="' + esc(s.name) + 'の場所をGoogleマップで見る（' + esc(s.city) + '）">' + PIN + esc(s.city) + '</a>'
+      ? '<a class="map-link" href="' + esc(mapUrl) + '" target="_blank" rel="noopener" aria-label="' + esc(T('map.aria', { name: s.name, city: W(s.city) })) + '">' + PIN + esc(W(s.city)) + '</a>'
       : '';
-    h += '<p class="meta">' + esc(s.kind || s.genre) + (place ? '｜' + place : '') + '</p>';
+    h += '<p class="meta">' + esc(kind || W(s.genre)) + (place ? '｜' + place : '') + '</p>';
     h += '<h3>' + esc(s.name) + '</h3>';
-    if (s.sub) h += '<p class="subname">' + esc(s.sub) + '</p>';
-    if (s.text) h += '<p class="text">' + esc(s.text) + '</p>';
-    if (s.info.length) h += '<ul class="info">' + s.info.map(function (l) { return '<li>' + esc(l) + '</li>'; }).join('') + '</ul>';
-    if (s.tag) h += '<span class="tag">' + esc(s.tag) + '</span>';
+    if (sub) h += '<p class="subname">' + esc(sub) + '</p>';
+    if (text) h += '<p class="text">' + esc(text) + '</p>';
+    if (info.length) h += '<ul class="info">' + info.map(function (l) { return '<li>' + esc(l) + '</li>'; }).join('') + '</ul>';
+    if (s.tag) h += '<span class="tag">' + esc(W(s.tag)) + '</span>';
     if (s.links.length) {
       h += '<div class="links">' + s.links.map(function (l) {
-        return '<a href="' + esc(safeUrl(l.url)) + '" target="_blank" rel="noopener">' + esc(l.label) + ARROW + '</a>';
+        return '<a href="' + esc(safeUrl(l.url)) + '" target="_blank" rel="noopener">' + esc(W(l.label)) + ARROW + '</a>';
       }).join('') + '</div>';
     }
     return h + '</div></article>';
   }
 
-  function chips(el, list, key, allLabel) {
+  function chips(el, list, key, allLabel, label) {
     el.innerHTML = '';
     ['all'].concat(list).forEach(function (v) {
       var b = document.createElement('button');
       b.type = 'button'; b.className = 'chip';
-      b.textContent = v === 'all' ? allLabel : v;
+      b.textContent = v === 'all' ? allLabel : (label ? label(v) : v);
       b.setAttribute('aria-pressed', state[key] === v ? 'true' : 'false');
       b.addEventListener('click', function () { state[key] = v; render(); });
       el.appendChild(b);
@@ -157,14 +174,16 @@
     var cities = [];
     shops.forEach(function (s) { if (s.city && cities.indexOf(s.city) < 0) cities.push(s.city); });
     var genres = GENRES.filter(function (g) { return shops.some(function (s) { return s.genre === g; }); });
-    chips(document.getElementById('genre-chips'), genres, 'genre', 'すべて');
-    chips(document.getElementById('area-chips'), cities, 'area', 'すべてのまち');
+    chips(document.getElementById('genre-chips'), genres, 'genre', T('chip.all'), W);
+    chips(document.getElementById('area-chips'), cities, 'area', T('chip.allArea'), W);
     var list = shops.filter(function (s) {
       return (state.genre === 'all' || s.genre === state.genre) && (state.area === 'all' || s.city === state.area);
     });
     grid.innerHTML = list.map(card).join('');
     setupSliders();
-    document.getElementById('shop-count').textContent = list.length + '軒のお店（全' + shops.length + '軒）';
+    document.getElementById('shop-count').textContent = T('shops.count', { n: list.length, t: shops.length });
+    var note = document.getElementById('mt-note');
+    if (note) note.hidden = I18N.lang === 'ja';
     document.getElementById('shop-empty').hidden = list.length > 0;
   }
 
@@ -312,6 +331,9 @@
     document.addEventListener('visibilitychange', function () { if (document.hidden) clearTimeout(timer); else schedule(HERO_INTERVAL); });
   }
 
+  // 言語が切り替わったら、お店のカードと絞り込みのボタンを描き直す
+  document.addEventListener('gururi:lang', function () { if (shops.length) render(); });
+
   function load(url) {
     return fetch(url, { cache: 'no-store' }).then(function (r) {
       if (!r.ok) throw new Error(r.status);
@@ -328,6 +350,6 @@
       startHero();
     })
     .catch(function () {
-      document.getElementById('shop-loading').textContent = 'お店の情報を読み込めませんでした。時間をおいて、もう一度開いてみてください。';
+      var ld = document.getElementById('shop-loading'); ld.setAttribute('data-i18n', 'error'); ld.textContent = T('error');
     });
 })();
