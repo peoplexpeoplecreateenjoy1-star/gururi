@@ -70,7 +70,9 @@
         // 写真は1〜5枚。改行・カンマ・読点で区切って書く
         photos: col(r, '写真').split(/[\n,、，]+/).map(function (p) { return p.trim(); }).filter(Boolean),
         // ページ冒頭の入れ替え用に選んだ写真（「トップの写真」の列）
-        top: col(r, 'トップの写真').split(/[\n,、，]+/).map(function (p) { return p.trim(); }).filter(Boolean)
+        top: col(r, 'トップの写真').split(/[\n,、，]+/).map(function (p) { return p.trim(); }).filter(Boolean),
+        // お店の場所（Googleマップ）。「地図のURL」の列が空なら、店名で地図を検索するリンクにする
+        map: col(r, '地図のURL')
       };
     });
   }
@@ -106,6 +108,8 @@
     }
   }, true);
 
+  var PIN = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 21s-6.5-5.6-6.5-11a6.5 6.5 0 0 1 13 0c0 5.4-6.5 11-6.5 11z"/><circle cx="12" cy="10" r="2.3"/></svg>';
+
   function card(s) {
     var st = STYLE[s.genre];
     var pic;
@@ -118,7 +122,12 @@
       }).join('');
     }
     var h = '<article class="card"><div class="card-pic' + (s.photos.length > 1 ? ' is-slider' : '') + '" style="background:' + st.bg + '">' + pic + '</div><div class="card-body">';
-    h += '<p class="meta">' + esc(s.kind || s.genre) + (s.city ? '｜' + esc(s.city) : '') + '</p>';
+    var mapUrl = /^https?:\/\//i.test(s.map) ? s.map
+      : 'https://www.google.com/maps/search/?api=1&query=' + encodeURIComponent([s.name, s.sub, s.city].filter(Boolean).join(' '));
+    var place = s.city
+      ? '<a class="map-link" href="' + esc(mapUrl) + '" target="_blank" rel="noopener" aria-label="' + esc(s.name) + 'の場所をGoogleマップで見る（' + esc(s.city) + '）">' + PIN + esc(s.city) + '</a>'
+      : '';
+    h += '<p class="meta">' + esc(s.kind || s.genre) + (place ? '｜' + place : '') + '</p>';
     h += '<h3>' + esc(s.name) + '</h3>';
     if (s.sub) h += '<p class="subname">' + esc(s.sub) + '</p>';
     if (s.text) h += '<p class="text">' + esc(s.text) + '</p>';

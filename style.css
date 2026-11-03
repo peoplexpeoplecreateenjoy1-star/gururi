@@ -78,6 +78,9 @@ p{margin:0}
 .card-pic svg{width:88px;height:88px}
 .card-body{padding:22px 24px 24px;display:flex;flex-direction:column;gap:10px;flex-grow:1}
 .meta{font-size:13px;font-weight:700;color:var(--sub);letter-spacing:.08em}
+.map-link{display:inline-flex;align-items:center;gap:2px;color:var(--terra-dk);text-decoration:underline;text-decoration-thickness:1px;text-underline-offset:4px;padding:6px 2px;margin:-6px 0}
+.map-link:hover{color:#7A3A20;text-decoration-thickness:2px}
+.map-link svg{width:14px;height:14px;flex:0 0 auto}
 .card h3{font-size:22px;line-height:1.45;letter-spacing:.06em}
 .subname{margin-top:-6px;font-size:13px;color:var(--sub)}
 .text{margin-top:4px;font-size:15px;line-height:1.95;white-space:pre-line}
