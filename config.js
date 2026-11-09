@@ -12,5 +12,6 @@ window.GURURI_CONFIG = {
   instagram: "https://www.instagram.com/gururi_hibarigaoka/",
   wazanohito: "https://www.torimich.com/ambassador",
   joinForm: "https://docs.google.com/forms/d/e/1FAIpQLSfUggRPA2s2wEhYJEuyCPymmmWzcLFDMaeBQZNSrIWbhR-jEQ/viewform",
-  torimichHome: "https://sites.google.com/view/torimich"
+  torimichHome: "https://sites.google.com/view/torimich",
+  latteInstagram: "https://www.instagram.com/seibu_cafe/"
 };
