@@ -142,7 +142,9 @@
     var sub = loc(s, 'sub'), kind = loc(s, 'kind'), text = loc(s, 'text');
     // お店の名前：シートの「店名_en」など → i18n.js の訳 → 日本語のまま。訳したときは、元の名前を小さく添える（看板を探す手がかりに）
     var lg = I18N.lang;
-    var nameTr = (lg !== 'ja' && s.tr && s.tr[lg] && s.tr[lg].name) || (I18N.shopName ? I18N.shopName(s.name) : '');
+    // 韓国語・中国語の名前がないときは、英語・ローマ字の名前（「店名_en」）を使う
+    var nameTr = (lg !== 'ja' && s.tr && s.tr[lg] && s.tr[lg].name) || (I18N.shopName ? I18N.shopName(s.name) : '') ||
+      (lg !== 'ja' && s.tr && s.tr.en && s.tr.en.name) || '';
     var shownName = nameTr || s.name;
     var infoTr = I18N.lang !== 'ja' && s.tr && s.tr[I18N.lang] ? s.tr[I18N.lang].info : '';
     var info = infoTr ? infoTr.split(/\n/).filter(Boolean) : s.info;
