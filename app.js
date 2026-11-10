@@ -30,7 +30,34 @@
   };
   var ARROW = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M9 6l6 6-6 6"/></svg>';
 
-  var state = { genre: 'all', area: 'all' };
+  var state = { genre: 'all', area: 'all', q: '' };
+
+  // キーワード検索：全角・半角、大文字・小文字、ひらがな・カタカナの違いは同じとみなす。空白で区切ると「すべてを含む」お店
+  function fold(t) {
+    return String(t || '').normalize('NFKC').toLowerCase()
+      .replace(/[\u30a1-\u30f6]/g, function (c) { return String.fromCharCode(c.charCodeAt(0) - 0x60); });
+  }
+  function words(q) { return fold(q).split(/[\s　]+/).filter(Boolean); }
+  function haystack(s) {
+    if (s._hay) return s._hay;
+    var parts = [s.name, s.sub, s.kind, s.genre, s.city, s.text, s.info.join(' '), s.tag, s.abroadNote];
+    ['en', 'ko', 'zh'].forEach(function (lg) {
+      var t = s.tr && s.tr[lg]; if (!t) return;
+      parts.push(t.name, t.sub, t.kind, t.text, t.info, t.abroadNote);
+    });
+    // ジャンル・市・札・リンク名・お店の名前の訳（i18n.js）も、4つの言語で探せるようにする
+    parts.push(W(s.genre), W(s.city), W(s.tag));
+    if (I18N.allWords) parts.push(I18N.allWords([s.genre, s.city, s.tag]));
+    if (I18N.allNames) parts.push(I18N.allNames(s.name));
+    s.links.forEach(function (l) { parts.push(l.label); });
+    s._hay = fold(parts.filter(Boolean).join(' '));
+    return s._hay;
+  }
+  function matchQ(s, ws) {
+    if (!ws.length) return true;
+    var h = haystack(s);
+    return ws.every(function (w) { return h.indexOf(w) >= 0; });
+  }
   var shops = [];
 
   // CSV（改行やカンマを含むセルにも対応）
@@ -205,15 +232,34 @@
     if (state.area !== 'all' && cities.indexOf(state.area) < 0) state.area = 'all';
     chips(document.getElementById('genre-chips'), genres, 'genre', T('chip.all'), W);
     chips(document.getElementById('area-chips'), cities, 'area', T('chip.allArea'), W);
+    var ws = words(state.q);
     var list = vis.filter(function (s) {
-      return (state.genre === 'all' || s.genre === state.genre) && (state.area === 'all' || s.city === state.area);
+      return (state.genre === 'all' || s.genre === state.genre) && (state.area === 'all' || s.city === state.area) && matchQ(s, ws);
     });
     grid.innerHTML = list.map(card).join('');
     setupSliders();
     document.getElementById('shop-count').textContent = T('shops.count', { n: list.length, t: vis.length });
     var note = document.getElementById('mt-note');
     if (note) note.hidden = I18N.lang === 'ja';
-    document.getElementById('shop-empty').hidden = list.length > 0;
+    var empty = document.getElementById('shop-empty');
+    empty.textContent = ws.length ? T('empty.q', { q: state.q.trim() }) : T('empty');
+    empty.hidden = list.length > 0;
+  }
+
+  // 検索窓：入力するたびに少し待ってから絞り込む。×で消す。?q=… でも開ける
+  var qIn = document.getElementById('shop-q'), qX = document.getElementById('shop-q-x'), qTimer = null;
+  if (qIn) {
+    try { var q0 = new URLSearchParams(location.search).get('q'); if (q0) { qIn.value = q0; state.q = q0; } } catch (e) {}
+    var sync = function () { if (qX) qX.hidden = !qIn.value; };
+    sync();
+    qIn.addEventListener('input', function () {
+      sync(); clearTimeout(qTimer);
+      qTimer = setTimeout(function () { state.q = qIn.value; if (shops.length) render(); }, 180);
+    });
+    qIn.addEventListener('keydown', function (e) { if (e.key === 'Enter') { e.preventDefault(); qIn.blur(); } });
+    if (qX) qX.addEventListener('click', function () {
+      qIn.value = ''; state.q = ''; sync(); if (shops.length) render(); qIn.focus();
+    });
   }
 
   // 写真の切り替え（約4秒ごとに、ゆっくり重ねるように切り替える。カードごとに少しずつずらす）

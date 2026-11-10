@@ -25,7 +25,7 @@
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Zen+Maru+Gothic:wght@500;700;900&family=Zen+Kaku+Gothic+New:wght@400;500;700&display=swap">
-<link rel="stylesheet" href="style.css?v=20261110e">
+<link rel="stylesheet" href="style.css?v=20261110f">
 </head>
 <body data-page="index">
 
@@ -90,6 +90,12 @@
 <p class="count" id="shop-count" aria-live="polite"></p>
 </div>
 <p class="mt-note" id="mt-note" data-i18n="shops.mt" hidden></p>
+<div class="search" role="search">
+<label class="sr-only" for="shop-q" data-i18n="search.label">キーワードでさがす</label>
+<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="11" cy="11" r="7"/><path d="M20 20l-4-4"/></svg>
+<input type="search" id="shop-q" class="search-in" placeholder="店名やキーワードでさがす（例：ベーグル、書道）" data-i18n-ph="search.ph" autocomplete="off" enterkeyhint="search">
+<button type="button" class="search-x" id="shop-q-x" aria-label="キーワードを消す" data-i18n-aria="search.clear" hidden><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" aria-hidden="true"><path d="M6 6l12 12M18 6L6 18"/></svg></button>
+</div>
 <div class="chips" id="genre-chips" role="group" aria-label="ジャンルでしぼる" data-i18n-aria="group.genre"></div>
 <div class="chips" id="area-chips" role="group" aria-label="まちでしぼる" data-i18n-aria="group.area"></div>
 <p class="loading" id="shop-loading" data-i18n="loading">お店の情報を読み込んでいます…</p>
@@ -136,8 +142,8 @@
 <small>© 2026 TORIMICH. All Rights Reserved.</small>
 </footer>
 
-<script src="config.js?v=20261110e"></script>
-<script src="i18n.js?v=20261110e"></script>
-<script src="app.js?v=20261110e"></script>
+<script src="config.js?v=20261110f"></script>
+<script src="i18n.js?v=20261110f"></script>
+<script src="app.js?v=20261110f"></script>
 </body>
 </html>

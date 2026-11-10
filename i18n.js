@@ -40,6 +40,10 @@
     'chip.allArea': ['すべてのまち', 'All areas', '모든 지역', '所有地區'],
     'group.genre': ['ジャンルでしぼる', 'Filter by category', '분야로 찾기', '依類別篩選'],
     'group.area': ['まちでしぼる', 'Filter by area', '지역으로 찾기', '依地區篩選'],
+    'search.label': ['キーワードでさがす', 'Search by keyword', '키워드로 찾기', '以關鍵字搜尋'],
+    'search.ph': ['店名やキーワードでさがす（例：ベーグル、書道）', 'Search by name or keyword (e.g. bagel)', '가게 이름이나 키워드로 찾기 (예: 베이글)', '以店名或關鍵字搜尋（例：貝果）'],
+    'search.clear': ['キーワードを消す', 'Clear search', '검색어 지우기', '清除搜尋'],
+    'empty.q': ['「{q}」に当てはまるお店は見つかりませんでした。ほかの言葉でもお試しください。', 'No shops found for “{q}”. Try another word.', '“{q}”에 해당하는 가게를 찾지 못했습니다. 다른 단어로 찾아보세요.', '找不到符合「{q}」的店家，請試試其他關鍵字。'],
     'loading': ['お店の情報を読み込んでいます…', 'Loading shops…', '가게 정보를 불러오는 중…', '正在載入店家資訊…'],
     'empty': ['この組み合わせのお店は、まだありません。', 'No shops match this combination yet.', '이 조건에 맞는 가게가 아직 없습니다.', '目前還沒有符合條件的店家。'],
     'error': ['お店の情報を読み込めませんでした。時間をおいて、もう一度開いてみてください。', 'We couldn’t load the shop information. Please try again in a little while.', '가게 정보를 불러오지 못했습니다. 잠시 후 다시 열어 주세요.', '無法載入店家資訊，請稍後再試一次。'],
@@ -167,6 +171,7 @@
     document.querySelectorAll('[data-i18n]').forEach(function (el) { el.innerHTML = t(el.getAttribute('data-i18n')); });
     document.querySelectorAll('[data-i18n-aria]').forEach(function (el) { el.setAttribute('aria-label', t(el.getAttribute('data-i18n-aria'))); });
     document.querySelectorAll('[data-i18n-alt]').forEach(function (el) { el.setAttribute('alt', t(el.getAttribute('data-i18n-alt'))); });
+    document.querySelectorAll('[data-i18n-ph]').forEach(function (el) { el.setAttribute('placeholder', t(el.getAttribute('data-i18n-ph'))); });
     // 日本語以外は、英語ページ用の GURURI ロゴにする
     document.querySelectorAll('img[data-logo]').forEach(function (img) {
       var white = img.getAttribute('data-logo') === 'white';
@@ -185,6 +190,8 @@
 
   window.GURURI_I18N = {
     get lang() { return lang; },
+    allWords: function (list) { return list.filter(Boolean).map(function (w) { return (WORDS[w] || [w]).join(' '); }).join(' '); },
+    allNames: function (ja) { return (NAMES[String(ja).replace(/\s+/g, '')] || []).join(' '); },
     t: t, word: word, set: set, shopName: shopName,
     suffix: function () { return lang === 'ja' ? '' : '_' + lang; }
   };
