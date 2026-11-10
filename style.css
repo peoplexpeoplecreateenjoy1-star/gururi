@@ -209,3 +209,6 @@ html[lang="zh-Hant"]{--maru:'PingFang TC','Noto Sans TC','Microsoft JhengHei',sa
 @media (max-width:720px){.tcard{text-align:center;padding:28px 24px}}
 .t-sub{display:block;margin-top:2px;font-family:var(--kaku);font-size:13px;font-weight:500;color:var(--sub);letter-spacing:.06em}
 .nw{display:inline-block;white-space:nowrap}
+
+/* 海外の方の対応 */
+.abroad-note{margin-top:2px;padding-left:10px;border-left:3px solid var(--line);font-size:13px;line-height:1.8;color:var(--sub);white-space:pre-line}

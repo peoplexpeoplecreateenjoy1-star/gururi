@@ -76,14 +76,27 @@
         top: col(r, 'トップの写真').split(/[\n,、，]+/).map(function (p) { return p.trim(); }).filter(Boolean),
         // お店の場所（Googleマップ）。「地図のURL」の列が空なら、店名で地図を検索するリンクにする
         map: col(r, '地図のURL'),
+        // 海外の方の対応（「可能」「不可」）。不可のお店は、日本語のときだけ表示する
+        abroad: abroadOf(col(r, '海外の方の対応')),
+        // お客様対応の備考（例：簡単な日本語が話せる方だと安心です）
+        abroadNote: col(r, 'お客様対応の備考'),
         // 英語・韓国語・中国語の訳（「紹介文_en」などの列）。空なら日本語のまま
         tr: ['en', 'ko', 'zh'].reduce(function (o, lg) {
-          o[lg] = { name: col(r, '店名_' + lg), sub: col(r, 'サブ名_' + lg), kind: col(r, '種類_' + lg), text: col(r, '紹介文_' + lg), info: col(r, 'くわしい情報_' + lg) };
+          o[lg] = { name: col(r, '店名_' + lg), sub: col(r, 'サブ名_' + lg), kind: col(r, '種類_' + lg), text: col(r, '紹介文_' + lg), info: col(r, 'くわしい情報_' + lg), abroadNote: col(r, 'お客様対応の備考_' + lg) };
           return o;
         }, {})
       };
     });
   }
+
+  // 「海外の方の対応」の書き方を読み取る。空欄は「まだ回答がない」として、これまでどおり全部の言語で表示する
+  function abroadOf(v) {
+    if (/不可|できない|×|✕|^no$/i.test(v)) return 'no';
+    if (/可能|できる|○|◯|^ok$|^yes$/i.test(v)) return 'yes';
+    return '';
+  }
+  // いまの言語で表示するお店か（日本語ならすべて、ほかの言語なら「不可」のお店を除く）
+  function shownInLang(s) { return I18N.lang === 'ja' || s.abroad !== 'no'; }
 
   function esc(s) {
     return String(s).replace(/[&<>"']/g, function (c) {
@@ -154,6 +167,11 @@
     if (sub) h += '<p class="subname">' + esc(sub) + '</p>';
     if (text) h += '<p class="text">' + esc(text) + '</p>';
     if (info.length) h += '<ul class="info">' + info.map(function (l) { return '<li>' + esc(l) + '</li>'; }).join('') + '</ul>';
+    // お客様対応の備考は、日本語以外のときだけ出す（「歓迎」などの表示はしない）
+    if (I18N.lang !== 'ja' && s.abroad !== 'no') {
+      var note = loc(s, 'abroadNote');
+      if (note) h += '<p class="abroad-note">' + esc(note) + '</p>';
+    }
     if (s.tag) h += '<span class="tag">' + esc(W(s.tag)) + '</span>';
     if (s.links.length) {
       h += '<div class="links">' + s.links.map(function (l) {
@@ -176,17 +194,21 @@
   }
 
   function render() {
+    var vis = shops.filter(shownInLang);
     var cities = [];
-    shops.forEach(function (s) { if (s.city && cities.indexOf(s.city) < 0) cities.push(s.city); });
-    var genres = GENRES.filter(function (g) { return shops.some(function (s) { return s.genre === g; }); });
+    vis.forEach(function (s) { if (s.city && cities.indexOf(s.city) < 0) cities.push(s.city); });
+    var genres = GENRES.filter(function (g) { return vis.some(function (s) { return s.genre === g; }); });
+    // 言語を切り替えて、選んでいたジャンル・まちのお店がなくなったときは「すべて」に戻す
+    if (state.genre !== 'all' && genres.indexOf(state.genre) < 0) state.genre = 'all';
+    if (state.area !== 'all' && cities.indexOf(state.area) < 0) state.area = 'all';
     chips(document.getElementById('genre-chips'), genres, 'genre', T('chip.all'), W);
     chips(document.getElementById('area-chips'), cities, 'area', T('chip.allArea'), W);
-    var list = shops.filter(function (s) {
+    var list = vis.filter(function (s) {
       return (state.genre === 'all' || s.genre === state.genre) && (state.area === 'all' || s.city === state.area);
     });
     grid.innerHTML = list.map(card).join('');
     setupSliders();
-    document.getElementById('shop-count').textContent = T('shops.count', { n: list.length, t: shops.length });
+    document.getElementById('shop-count').textContent = T('shops.count', { n: list.length, t: vis.length });
     var note = document.getElementById('mt-note');
     if (note) note.hidden = I18N.lang === 'ja';
     document.getElementById('shop-empty').hidden = list.length > 0;
@@ -315,8 +337,9 @@
     }
     // いま並んでいるお店を避けて、同じお店が重ならないように選ぶ
     function plan(count) {
-      var fresh = shuffle(pool.filter(function (s) { return shown.indexOf(s) < 0; }));
-      var rest = shuffle(pool.filter(function (s) { return shown.indexOf(s) >= 0; }));
+      var ok = pool.filter(shownInLang);
+      var fresh = shuffle(ok.filter(function (s) { return shown.indexOf(s) < 0; }));
+      var rest = shuffle(ok.filter(function (s) { return shown.indexOf(s) >= 0; }));
       return fresh.concat(rest).slice(0, count).map(function (sh) {
         return { shop: sh, src: photoSrc(sh.top[Math.floor(Math.random() * sh.top.length)]) };
       });
