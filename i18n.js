@@ -13,6 +13,9 @@
 
   var D = {
     'title.index': ['ぐるり｜ひばりヶ丘の、暮らしのそばにあるお店', 'GURURI | Shops close to everyday life in Hibarigaoka', 'GURURI | 히바리가오카의 일상 가까이에 있는 가게', 'GURURI｜雲雀丘（Hibarigaoka）生活周遭的小店'],
+    'title.privacy': ['プライバシーポリシー｜ぐるり ひばりヶ丘', 'Privacy Policy | GURURI Hibarigaoka', '개인정보 처리방침 | GURURI Hibarigaoka', '隱私權政策｜GURURI Hibarigaoka'],
+    'nav.privacy': ['プライバシーポリシー', 'Privacy Policy', '개인정보 처리방침', '隱私權政策'],
+    'pp.note': ['', '', '이 개인정보 처리방침은 일본어판과 영어판만 있습니다. 아래는 영어판입니다. 일본어판과 영어판의 의미가 다를 경우 일본어판이 우선합니다.', '本隱私權政策僅提供日文版與英文版。以下為英文版。日文版與英文版內容有出入時，以日文版為準。'],
     'title.concept': ['ぐるりについて｜いつもの道に、寄り道をひとつ。', 'About GURURI | One small detour on your everyday path', '구루리 소개 | 늘 다니던 길에, 잠깐 들를 곳 하나', '關於 GURURI｜在熟悉的路上，多一個順道的去處'],
     'brand': ['ぐるり', 'GURURI', 'GURURI', 'GURURI'],
     'lang.label': ['言語', 'Language', '언어', '語言'],
