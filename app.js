@@ -30,7 +30,7 @@
   };
   var ARROW = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M9 6l6 6-6 6"/></svg>';
 
-  var state = { genre: 'all', area: 'all', q: '' };
+  var state = { genre: 'all', area: 'all', q: '', coupon: false };
 
   // キーワード検索：全角・半角、大文字・小文字、ひらがな・カタカナの違いは同じとみなす。空白で区切ると「すべてを含む」お店
   function fold(t) {
@@ -40,7 +40,7 @@
   function words(q) { return fold(q).split(/[\s　]+/).filter(Boolean); }
   function haystack(s) {
     if (s._hay) return s._hay;
-    var parts = [s.name, s.sub, s.kind, s.genre, s.city, s.text, s.info.join(' '), s.tag, s.abroadNote];
+    var parts = [s.name, s.sub, s.kind, s.genre, s.city, s.text, s.info.join(' '), s.tag, s.abroadNote, s.coupon ? s.couponGift : ''];
     ['en', 'ko', 'zh'].forEach(function (lg) {
       var t = s.tr && s.tr[lg]; if (!t) return;
       parts.push(t.name, t.sub, t.kind, t.text, t.info, t.abroadNote);
@@ -107,9 +107,14 @@
         abroad: abroadOf(col(r, '海外の方の対応')),
         // お客様対応の備考（例：簡単な日本語が話せる方だと安心です）
         abroadNote: col(r, 'お客様対応の備考'),
+        // クーポン（「クーポン」の列が「出す」で、特典が書いてあるお店だけ、カードにボタンを出す）
+        coupon: /出す|あり|^yes$|^true$/i.test(col(r, 'クーポン')) && !!col(r, 'クーポンの特典'),
+        couponGift: col(r, 'クーポンの特典'),
+        couponCond: col(r, 'クーポンの条件'),
         // 英語・韓国語・中国語の訳（「紹介文_en」などの列）。空なら日本語のまま
         tr: ['en', 'ko', 'zh'].reduce(function (o, lg) {
-          o[lg] = { name: col(r, '店名_' + lg), sub: col(r, 'サブ名_' + lg), kind: col(r, '種類_' + lg), text: col(r, '紹介文_' + lg), info: col(r, 'くわしい情報_' + lg), abroadNote: col(r, 'お客様対応の備考_' + lg) };
+          o[lg] = { name: col(r, '店名_' + lg), sub: col(r, 'サブ名_' + lg), kind: col(r, '種類_' + lg), text: col(r, '紹介文_' + lg), info: col(r, 'くわしい情報_' + lg), abroadNote: col(r, 'お客様対応の備考_' + lg),
+            couponGift: col(r, 'クーポンの特典_' + lg), couponCond: col(r, 'クーポンの条件_' + lg) };
           return o;
         }, {})
       };
@@ -202,6 +207,10 @@
       if (note) h += '<p class="abroad-note">' + esc(note) + '</p>';
     }
     if (s.tag) h += '<span class="tag">' + esc(W(s.tag)) + '</span>';
+    if (s.coupon) {
+      h += '<button type="button" class="coupon-btn" data-coupon="' + shops.indexOf(s) + '">' + TICKET +
+        '<span>' + esc(T('coupon.btn')) + '</span><small>' + esc(loc(s, 'couponGift')) + '</small></button>';
+    }
     if (s.links.length) {
       h += '<div class="links">' + s.links.map(function (l) {
         return '<a href="' + esc(safeUrl(l.url)) + '" target="_blank" rel="noopener">' + esc(W(l.label)) + ARROW + '</a>';
@@ -222,6 +231,31 @@
     });
   }
 
+  // 「クーポンあり」の切り替え（押すたびに、オン／オフ）
+  function couponChip(show) {
+    var el = document.getElementById('coupon-chips'), bn = document.getElementById('cp-banner');
+    if (bn) bn.hidden = !show;
+    if (!el) return;
+    el.hidden = !show;
+    document.getElementById('area-chips').classList.toggle('chips-last', !show);
+    el.classList.toggle('chips-last', show);
+    if (!show) { el.innerHTML = ''; return; }
+    el.innerHTML = '<button type="button" class="chip chip-coupon" aria-pressed="' + (state.coupon ? 'true' : 'false') + '">' +
+      TICKET + '<span>' + esc(T('coupon.chip')) + '</span></button>';
+    el.firstChild.addEventListener('click', function () { state.coupon = !state.coupon; render(); });
+  }
+  // 上の「ぐるりクーポン」ボタン：クーポンありだけにして、お店のカードのところまでスクロールする
+  function showCouponShops(smooth) {
+    state.coupon = true; state.genre = 'all'; state.area = 'all';
+    if (qIn && qIn.value) { qIn.value = ''; state.q = ''; if (qX) qX.hidden = true; }
+    render();
+    var target = document.getElementById('coupon-chips');
+    if (!target || target.hidden) target = grid;
+    var reduce = window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+    target.scrollIntoView({ behavior: smooth && !reduce ? 'smooth' : 'auto', block: 'start' });
+    try { grid.focus({ preventScroll: true }); } catch (e) {}
+  }
+
   function render() {
     var vis = shops.filter(shownInLang);
     var cities = [];
@@ -232,9 +266,14 @@
     if (state.area !== 'all' && cities.indexOf(state.area) < 0) state.area = 'all';
     chips(document.getElementById('genre-chips'), genres, 'genre', T('chip.all'), W);
     chips(document.getElementById('area-chips'), cities, 'area', T('chip.allArea'), W);
+    // クーポンありのお店がある言語だけ、「クーポンあり」の絞り込みと、上の「ぐるりクーポン」ボタンを出す
+    var anyCoupon = vis.some(function (s) { return s.coupon; });
+    if (!anyCoupon) state.coupon = false;
+    couponChip(anyCoupon);
     var ws = words(state.q);
     var list = vis.filter(function (s) {
-      return (state.genre === 'all' || s.genre === state.genre) && (state.area === 'all' || s.city === state.area) && matchQ(s, ws);
+      return (state.genre === 'all' || s.genre === state.genre) && (state.area === 'all' || s.city === state.area) &&
+        (!state.coupon || s.coupon) && matchQ(s, ws);
     });
     grid.innerHTML = list.map(card).join('');
     setupSliders();
@@ -408,6 +447,96 @@
   }
 
   // 言語が切り替わったら、お店のカードと絞り込みのボタンを描き直す
+  /* ───────── クーポン画面 ─────────
+     お会計の前に、お店の方に見せてもらう画面。開いたときに GA4 へ coupon_open（shop_name：日本語の店名）を送る */
+  var TICKET = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M3 8a2 2 0 0 0 2-2h14a2 2 0 0 0 2 2v2a2 2 0 0 0 0 4v2a2 2 0 0 0-2 2H5a2 2 0 0 0-2-2v-2a2 2 0 0 0 0-4z"/><path d="M14 6v12" stroke-dasharray="2 2.2"/></svg>';
+  var LOCALE = { ja: 'ja-JP', en: 'en-US', ko: 'ko-KR', zh: 'zh-TW' };
+  function fmtDate(d, withDay) {
+    var o = { year: 'numeric', month: 'long', day: 'numeric' };
+    if (withDay) o.weekday = 'short';
+    try { return new Intl.DateTimeFormat(LOCALE[I18N.lang] || 'ja-JP', o).format(d); }
+    catch (e) { return d.getFullYear() + '/' + (d.getMonth() + 1) + '/' + d.getDate(); }
+  }
+  var cpBox = null, cpLastFocus = null, cpOpenIdx = -1;
+  function couponHtml(s) {
+    var lg = I18N.lang;
+    var nameTr = (lg !== 'ja' && s.tr && s.tr[lg] && s.tr[lg].name) || (I18N.shopName ? I18N.shopName(s.name) : '') ||
+      (lg !== 'ja' && s.tr && s.tr.en && s.tr.en.name) || '';
+    var now = new Date();
+    var end = new Date(now.getFullYear(), now.getMonth() + 1, 0);   // その月の末日
+    var own = (loc(s, 'couponCond') || '').split(/\n/).map(function (l) { return l.trim(); }).filter(Boolean);
+    var common = ['coupon.c1', 'coupon.c2', 'coupon.c3', 'coupon.c4', 'coupon.c5'].map(function (k) { return T(k); });
+    return '<div class="cp-sheet" role="dialog" aria-modal="true" aria-labelledby="cp-shop">' +
+      '<button type="button" class="cp-close" data-cp-close aria-label="' + esc(T('coupon.close')) + '"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" aria-hidden="true"><path d="M6 6l12 12M18 6L6 18"/></svg></button>' +
+      '<div class="cp-ticket">' +
+        '<div class="cp-head"><img src="assets/' + (lg === 'ja' ? 'logo-white.svg' : 'logo-en-white.svg') + '" alt="' + esc(T('brand')) + '" width="64" height="31"><span>' + esc(T('coupon.title')) + '</span></div>' +
+        '<div class="cp-main">' +
+          '<p class="cp-shop" id="cp-shop">' + esc(nameTr || s.name) + '</p>' +
+          (nameTr && nameTr !== s.name ? '<p class="cp-orig" lang="ja">' + esc(s.name) + '</p>' : '') +
+          '<p class="cp-gift">' + esc(loc(s, 'couponGift')) + '</p>' +
+        '</div>' +
+        '<div class="cp-tear" aria-hidden="true"></div>' +
+        '<dl class="cp-dates">' +
+          '<div class="cp-today"><dt>' + esc(T('coupon.today')) + '</dt><dd>' + esc(fmtDate(now, true)) + '</dd></div>' +
+          '<div><dt>' + esc(T('coupon.until')) + '</dt><dd>' + esc(T('coupon.untilv', { d: fmtDate(end, false) })) + '</dd></div>' +
+        '</dl>' +
+        '<p class="cp-show">' + esc(T('coupon.show')) + '</p>' +
+      '</div>' +
+      '<div class="cp-cond"><h3>' + esc(T('coupon.cond')) + '</h3><ul>' +
+        own.map(function (l) { return '<li class="cp-own">' + esc(l) + '</li>'; }).join('') +
+        common.map(function (l) { return '<li>' + esc(l) + '</li>'; }).join('') +
+      '</ul></div>' +
+    '</div>';
+  }
+  function openCoupon(idx, fromHistory) {
+    var s = shops[idx]; if (!s || !s.coupon) return;
+    if (!cpBox) {
+      cpBox = document.createElement('div'); cpBox.className = 'cp-overlay'; cpBox.hidden = true;
+      document.body.appendChild(cpBox);
+      cpBox.addEventListener('click', function (e) {
+        if (e.target === cpBox || e.target.closest('[data-cp-close]')) closeCoupon();
+      });
+      document.addEventListener('keydown', function (e) { if (e.key === 'Escape' && !cpBox.hidden) closeCoupon(); });
+    }
+    cpOpenIdx = idx;
+    cpLastFocus = document.activeElement;
+    cpBox.innerHTML = couponHtml(s);
+    cpBox.hidden = false;
+    document.documentElement.classList.add('cp-lock');
+    var x = cpBox.querySelector('.cp-close'); if (x) x.focus();
+    if (!fromHistory) { try { history.pushState({ coupon: idx }, '', '#coupon=' + encodeURIComponent(s.name)); } catch (e) {} }
+    // 開かれた記録（GA4）
+    try { if (typeof gtag === 'function') gtag('event', 'coupon_open', { shop_name: s.name }); } catch (e) {}
+  }
+  function closeCoupon(fromHistory) {
+    if (!cpBox || cpBox.hidden) return;
+    cpBox.hidden = true; cpOpenIdx = -1;
+    document.documentElement.classList.remove('cp-lock');
+    if (!fromHistory && /^#coupon=/.test(location.hash)) { try { history.back(); } catch (e) {} }
+    if (cpLastFocus && cpLastFocus.focus) cpLastFocus.focus();
+  }
+  var cpBanner = document.getElementById('cp-banner');
+  if (cpBanner) cpBanner.addEventListener('click', function () { showCouponShops(true); });
+  if (grid) grid.addEventListener('click', function (e) {
+    var b = e.target.closest('[data-coupon]'); if (b) openCoupon(Number(b.getAttribute('data-coupon')));
+  });
+  window.addEventListener('popstate', function () {
+    var m = location.hash.match(/^#coupon=(.+)$/);
+    if (!m) return closeCoupon(true);
+    var name = decodeURIComponent(m[1]);
+    var i = shops.findIndex(function (s) { return s.name === name; });
+    if (i >= 0) openCoupon(i, true);
+  });
+  // #coupon=店名 のリンクで開いたとき（お店の一覧が読み込まれてから開く）
+  function openCouponFromHash() {
+    var m = location.hash.match(/^#coupon=(.+)$/); if (!m) return;
+    var name = decodeURIComponent(m[1]);
+    var i = shops.findIndex(function (s) { return s.name === name; });
+    if (i >= 0) openCoupon(i, true);
+  }
+  // 言語を切り替えたら、開いているクーポン画面もその言語にする
+  document.addEventListener('gururi:lang', function () { if (cpBox && !cpBox.hidden && cpOpenIdx >= 0) cpBox.innerHTML = couponHtml(shops[cpOpenIdx]); });
+
   document.addEventListener('gururi:lang', function () { if (shops.length) render(); });
 
   function load(url) {
@@ -424,6 +553,9 @@
       document.getElementById('shop-loading').hidden = true;
       render();
       startHero();
+      openCouponFromHash();
+      // index.html#coupons で開いたときは、クーポンありのお店を出す（チラシやInstagramからのリンク用）
+      if (location.hash === '#coupons' && shops.some(function (s) { return s.coupon && shownInLang(s); })) showCouponShops(false);
     })
     .catch(function () {
       var ld = document.getElementById('shop-loading'); ld.setAttribute('data-i18n', 'error'); ld.textContent = T('error');

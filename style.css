@@ -246,3 +246,60 @@ html[lang="zh-Hant"]{--maru:'PingFang TC','Noto Sans TC','Microsoft JhengHei',sa
 .pp-doc th,.pp-doc td{border:1px solid #E6DCCF;padding:10px 12px;text-align:left;vertical-align:top}
 .pp-doc th{background:var(--kinari);font-weight:700}
 @media (max-width:720px){.pp{padding:36px 16px 72px}.pp-doc{padding:28px 20px 24px;font-size:15px}.pp-doc .pp-title{font-size:22px}.pp-doc h2{font-size:18px;margin-top:36px}}
+
+
+/* ぐるりクーポン */
+.coupon-btn{display:flex;align-items:center;gap:10px;width:100%;min-height:52px;margin-top:4px;padding:10px 16px;border:2px solid var(--terra);border-radius:14px;background:#FDF5EF;color:var(--terra-dk);font-family:inherit;text-align:left;cursor:pointer}
+.coupon-btn svg{width:24px;height:24px;flex:none}
+.coupon-btn span{font-weight:700;font-size:14px;letter-spacing:.06em;white-space:nowrap}
+.coupon-btn small{flex:1;min-width:0;font-size:13px;color:var(--ink);overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.coupon-btn:hover{background:#FBE9DD}
+.coupon-btn:focus-visible{outline:3px solid rgba(94,154,78,.5);outline-offset:2px}
+html.cp-lock,html.cp-lock body{overflow:hidden}
+.cp-overlay{position:fixed;inset:0;z-index:100;display:flex;align-items:flex-start;justify-content:center;padding:24px 16px;overflow-y:auto;background:rgba(58,42,36,.6)}
+.cp-overlay[hidden]{display:none}
+.cp-sheet{position:relative;width:100%;max-width:440px;margin:auto 0;padding:20px;border-radius:28px;background:var(--kinari)}
+.cp-close{position:absolute;top:10px;right:10px;z-index:2;width:44px;height:44px;display:grid;place-items:center;border:0;border-radius:50%;background:#fff;color:var(--ink);cursor:pointer}
+.cp-close svg{width:20px;height:20px}
+.cp-ticket{background:#fff;border-radius:20px;overflow:hidden;text-align:center}
+.cp-head{display:flex;align-items:center;justify-content:center;gap:12px;padding:14px 56px 12px;background:var(--terra);color:#fff;font-family:var(--maru);font-weight:700;letter-spacing:.12em;font-size:14px}
+.cp-head img{height:26px;width:auto}
+.cp-main{padding:24px 22px 18px}
+.cp-shop{margin:0;font-family:var(--maru);font-weight:700;font-size:20px;line-height:1.5;letter-spacing:.04em}
+.cp-orig{margin:2px 0 0;font-size:13px;color:var(--sub)}
+.cp-gift{margin:14px 0 0;font-family:var(--maru);font-weight:900;font-size:26px;line-height:1.5;color:var(--terra-dk);letter-spacing:.04em;word-break:break-word}
+.cp-tear{position:relative;height:0;margin:0 18px;border-top:2px dashed #E6D5C6}
+.cp-tear::before,.cp-tear::after{content:"";position:absolute;top:-13px;width:24px;height:24px;border-radius:50%;background:var(--kinari)}
+.cp-tear::before{left:-30px}.cp-tear::after{right:-30px}
+.cp-dates{margin:0;padding:18px 22px 4px;display:grid;gap:10px}
+.cp-dates div{margin:0}
+.cp-dates dt{font-size:12px;font-weight:700;letter-spacing:.1em;color:var(--sub)}
+.cp-dates dd{margin:2px 0 0;font-size:15px;font-weight:700}
+.cp-today dd{font-family:var(--maru);font-size:30px;font-weight:900;line-height:1.4;color:var(--ink);letter-spacing:.02em}
+.cp-show{margin:12px 22px 22px;padding:12px 14px;border-radius:12px;background:#FDF5EF;font-size:14px;font-weight:700;line-height:1.7;color:var(--terra-dk)}
+.cp-cond{margin-top:16px;padding:18px 20px;background:#fff;border-radius:20px}
+.cp-cond h3{margin:0 0 8px;font-family:var(--maru);font-size:15px;letter-spacing:.06em}
+.cp-cond ul{margin:0;padding-left:1.3em;font-size:13px;line-height:1.85}
+.cp-cond li{margin:0 0 2px}
+.cp-cond .cp-own{font-weight:700;color:var(--ink)}
+@media (min-width:721px){.cp-overlay{align-items:center}}
+
+
+/* クーポンありの絞り込み・上の「ぐるりクーポン」ボタン */
+.chips+.chips{margin-bottom:12px}
+.chips.chips-last{margin-bottom:36px}
+#coupon-chips{scroll-margin-top:16px}
+.chip-coupon{display:inline-flex;align-items:center;gap:8px;border-color:var(--terra);color:var(--terra-dk);background:#FDF5EF}
+.chip-coupon svg{width:20px;height:20px}
+.chip-coupon[aria-pressed="true"]{border-color:var(--terra);background:var(--terra);color:#fff}
+.cp-banner{display:flex;align-items:center;gap:14px;width:100%;max-width:560px;margin:0 0 28px;padding:14px 20px;border:0;border-radius:18px;background:var(--terra);color:#fff;font-family:inherit;text-align:left;cursor:pointer;box-shadow:0 2px 0 var(--terra-dk)}
+.cp-banner[hidden]{display:none}
+.cp-banner:hover{background:var(--terra-dk)}
+.cp-banner:focus-visible{outline:3px solid rgba(94,154,78,.6);outline-offset:3px}
+.cp-banner-ic{width:34px;height:34px;flex:none}
+.cp-banner-t{flex:1;display:flex;flex-direction:column;gap:2px;min-width:0}
+.cp-banner-t b{font-family:var(--maru);font-size:18px;font-weight:700;letter-spacing:.08em}
+.cp-banner-t small{font-size:13px;letter-spacing:.04em;opacity:.95}
+.cp-banner-go{width:22px;height:22px;flex:none}
+#shop-grid:focus{outline:none}
+.search-x[hidden]{display:none}
