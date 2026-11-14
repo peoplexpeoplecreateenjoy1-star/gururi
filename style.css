@@ -118,7 +118,7 @@ p{margin:0}
 .ft small{display:block;max-width:1200px;margin:28px auto 0;font-size:12px;color:#D9CDBE}
 
 /* concept page */
-.c-hero{position:relative;overflow:hidden;background:linear-gradient(rgba(247,242,234,.78),rgba(247,242,234,.78)),url("assets/bg/concept-hero.jpg") center 60%/cover no-repeat,var(--kinari)}
+.c-hero{position:relative;overflow:hidden;background:linear-gradient(rgba(247,242,234,.78),rgba(247,242,234,.78)),url("assets/bg/concept-hero.jpg?v=2") center 55%/cover no-repeat,var(--kinari)}
 .cloud{position:absolute;border-radius:999px;background:var(--kinari);opacity:.85}
 .c-hero-in{position:relative;max-width:1100px;margin:0 auto;padding:96px 24px 40px;display:flex;flex-wrap:wrap;gap:40px 80px;align-items:center;justify-content:center}
 .c-hero h1{height:480px;font-size:46px;line-height:1.6;letter-spacing:.2em}
@@ -315,3 +315,12 @@ html{scroll-behavior:smooth}
 #shops{scroll-margin-top:8px}
 .intro-body p.intro-more{margin:18px 0 0 6px;font-size:14px;line-height:1.8}
 .intro-more a{color:var(--terra-dk);text-underline-offset:4px}
+
+/* ロゴの右の地域名（2026-11-15・G決定）：ロゴの高さの約40%、文字の底を「る」の底にそろえる（下揃え） */
+.brand{align-items:flex-end;gap:10px}
+.brand .brand-area,.ft-brand .brand-area{font-family:var(--maru);font-weight:700;color:var(--ink);font-size:17px;line-height:1;letter-spacing:.08em;white-space:nowrap;margin-bottom:1px}
+.ft-brand{display:flex;align-items:flex-end;gap:11px}
+.ft-brand .brand-area.brand-area{color:var(--kinari);font-size:18px}
+@media (max-width:440px){html:not([lang="ja"]) .brand img{height:32px}html:not([lang="ja"]) .brand .brand-area{font-size:13px;letter-spacing:.03em}html:not([lang="ja"]) .brand{gap:7px}html:not([lang="ja"]) .hd-in{column-gap:10px}}
+@media (max-width:385px){.hd-in{column-gap:8px}.lang{padding:0 10px;gap:4px}.lang svg{width:16px;height:16px}.brand{gap:8px}.brand img{height:34px}.brand .brand-area{font-size:15px;letter-spacing:.05em}
+  html:not([lang="ja"]) .brand img{height:28px}html:not([lang="ja"]) .brand .brand-area{font-size:12px;letter-spacing:.02em}html:not([lang="ja"]) .brand{gap:6px}}
