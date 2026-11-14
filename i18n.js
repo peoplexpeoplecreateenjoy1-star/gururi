@@ -43,6 +43,8 @@
     'chip.allArea': ['すべてのまち', 'All areas', '모든 지역', '所有地區'],
     'group.genre': ['ジャンルでしぼる', 'Filter by category', '분야로 찾기', '依類別篩選'],
     'group.area': ['まちでしぼる', 'Filter by area', '지역으로 찾기', '依地區篩選'],
+    'fresh.new': ['新着', 'New', 'NEW', '新上架'],
+    'fresh.upd': ['更新', 'Updated', '업데이트', '已更新'],
     'coupon.btn': ['ぐるりクーポン', 'GURURI coupon', '구루리 쿠폰', 'GURURI 優惠券'],
     'coupon.title': ['クーポン', 'COUPON', '쿠폰', '優惠券'],
     'coupon.today': ['今日の日付', 'Today', '오늘 날짜', '今天日期'],

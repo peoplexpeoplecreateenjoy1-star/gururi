@@ -14,6 +14,8 @@
   if (!grid) return;
 
   var GENRES = ['パン・お菓子', '食事・カフェ', '雑貨・ギフト', '教室・体験', '暮らし'];
+  // 一覧の上の方に先に並べるジャンル（飲食系）
+  var TOP_GENRES = ['パン・お菓子', '食事・カフェ'];
   var STYLE = {
     'パン・お菓子': { bg: '#E4B54A', fg: '#3A2A24', icon: 'bread' },
     '食事・カフェ': { bg: '#D46A3C', fg: '#FFFFFF', icon: 'cup' },
@@ -80,6 +82,24 @@
     return rows;
   }
 
+  /* ───────── 新着・更新 ─────────
+     公開した日から FRESH_DAYS 日のあいだ、カードの写真に小さな札を付け、一覧の上の方に並べる */
+  var FRESH_DAYS = 30;
+  function freshKind(v) {
+    if (/新着|新規|^new$/i.test(v)) return 'new';
+    if (/更新|^update/i.test(v)) return 'upd';
+    return '';
+  }
+  function parseDay(v) {
+    var m = String(v || '').match(/(\d{4})\D+(\d{1,2})\D+(\d{1,2})/);
+    return m ? new Date(Number(m[1]), Number(m[2]) - 1, Number(m[3])) : null;
+  }
+  function isFresh(s) {
+    if (!s.fresh || !s.freshDate) return false;
+    var days = (Date.now() - s.freshDate.getTime()) / 86400000;
+    return days >= -1 && days < FRESH_DAYS;
+  }
+
   function toShops(rows) {
     var head = rows.shift().map(function (h) { return h.trim(); });
     var col = function (r, name) { var i = head.indexOf(name); return i < 0 ? '' : (r[i] || '').trim(); };
@@ -108,6 +128,9 @@
         // お客様対応の備考（例：簡単な日本語が話せる方だと安心です）
         abroadNote: col(r, 'お客様対応の備考'),
         // クーポン（「クーポン」の列が「出す」で、特典が書いてあるお店だけ、カードにボタンを出す）
+        // 新着・更新の札（受付と公開のスクリプトが、公開した日と一緒に書き込む）
+        fresh: freshKind(col(r, '新着・更新')),
+        freshDate: parseDay(col(r, '新着・更新の日')),
         coupon: /出す|あり|^yes$|^true$/i.test(col(r, 'クーポン')) && !!col(r, 'クーポンの特典'),
         couponGift: col(r, 'クーポンの特典'),
         couponCond: col(r, 'クーポンの条件'),
@@ -189,7 +212,8 @@
         return '<img class="slide' + (i === 0 ? ' is-on' : '') + '" src="' + esc(photoSrc(p)) + '" alt="' + esc(T('photo.alt', { name: s.name })) + (n > 1 ? ' (' + (i + 1) + '/' + n + ')' : '') + '"' + (i === 0 ? '' : ' aria-hidden="true"') + ' loading="lazy">';
       }).join('');
     }
-    var h = '<article class="card"><div class="card-pic' + (s.photos.length > 1 ? ' is-slider' : '') + '" style="background:' + st.bg + '">' + pic + '</div><div class="card-body">';
+    var badge = isFresh(s) ? '<span class="fresh fresh-' + s.fresh + '">' + esc(T('fresh.' + s.fresh)) + '</span>' : '';
+    var h = '<article class="card"><div class="card-pic' + (s.photos.length > 1 ? ' is-slider' : '') + '" style="background:' + st.bg + '">' + pic + badge + '</div><div class="card-body">';
     var mapUrl = /^https?:\/\//i.test(s.map) ? s.map
       : 'https://www.google.com/maps/search/?api=1&query=' + encodeURIComponent([s.name, s.sub, s.city].filter(Boolean).join(' '));
     var place = s.city
@@ -275,6 +299,16 @@
       return (state.genre === 'all' || s.genre === state.genre) && (state.area === 'all' || s.city === state.area) &&
         (!state.coupon || s.coupon) && matchQ(s, ws);
     });
+    // 並び順（2026-11-14・G決定）
+    //  1. 新着・更新のお店が上（その中では、飲食系 → 新しい日付の順）
+    //  2. そのあと、新着・更新ではないお店（その中でも、飲食系が先。あとはシートの並びのまま）
+    //  飲食系＝写真が映えやすく、入口になりやすいジャンル（TOP_GENRES）
+    list = list.map(function (s, i) { return { s: s, i: i, f: isFresh(s), t: TOP_GENRES.indexOf(s.genre) >= 0 }; }).sort(function (a, b) {
+      if (a.f !== b.f) return a.f ? -1 : 1;
+      if (a.t !== b.t) return a.t ? -1 : 1;
+      if (a.f && b.f && a.s.freshDate.getTime() !== b.s.freshDate.getTime()) return b.s.freshDate - a.s.freshDate;
+      return a.i - b.i;
+    }).map(function (x) { return x.s; });
     grid.innerHTML = list.map(card).join('');
     setupSliders();
     document.getElementById('shop-count').textContent = T('shops.count', { n: list.length, t: vis.length });

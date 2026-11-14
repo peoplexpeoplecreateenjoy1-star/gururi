@@ -303,3 +303,8 @@ html.cp-lock,html.cp-lock body{overflow:hidden}
 .cp-banner-go{width:22px;height:22px;flex:none}
 #shop-grid:focus{outline:none}
 .search-x[hidden]{display:none}
+
+/* 新着・更新の札（カードの写真の左上） */
+.fresh{position:absolute;top:12px;left:12px;z-index:3;padding:3px 12px;border-radius:999px;font-size:12px;font-weight:700;line-height:1.7;letter-spacing:.08em;pointer-events:none;box-shadow:0 1px 3px rgba(58,42,36,.18)}
+.fresh-new{background:var(--terra);color:#fff}
+.fresh-upd{background:#fff;color:var(--terra-dk);border:1.5px solid var(--terra)}
