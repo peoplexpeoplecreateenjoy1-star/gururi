@@ -28,12 +28,12 @@
     'nav.torimich': ['通り道（TORIMICH）', 'TORIMICH', 'TORIMICH', 'TORIMICH'],
 
     'hero.copy': ['いつもの道に、寄り道をひとつ。', 'One small detour on your everyday path.', '늘 다니던 길에, 잠깐 들를 곳 하나.', '在熟悉的路上，多一個順道的去處。'],
-    'intro.title': ['ひばりヶ丘の、<br>暮らしのそばにあるお店です。', 'Shops close to everyday life<br>in Hibarigaoka.', '히바리가오카의,<br>일상 가까이에 있는 가게입니다.', '雲雀丘（Hibarigaoka）<br>生活周遭的小店。'],
-    'intro.p1': ['焼きたてのパン屋さんに、お菓子屋さん、かばん屋さんまで。', 'From bakeries with fresh-baked bread to sweet shops and bag makers.', '갓 구운 빵집부터 과자 가게, 가방 가게까지.', '從剛出爐的麵包店、點心店，到包包店。'],
-    'intro.p2': ['いつもの買い物の途中に、ふらりと寄れる場所ばかりです。', 'Each one is easy to drop by on your usual errands.', '평소 장 보러 가는 길에 훌쩍 들를 수 있는 곳들입니다.', '都是平日購物途中，能隨興順道走進去的地方。'],
-    'intro.p3': ['紹介文は、お店の方それぞれの言葉で。', 'Each introduction comes in the shop’s own words.', '소개 글은 가게 분들의 말 그대로입니다.', '介紹文字都是店家自己的話。'],
-    'intro.p4': ['月に一度、更新されます。', 'Updated once a month.', '한 달에 한 번 업데이트됩니다.', '每月更新一次。'],
-    'intro.p5': ['気になるお店があれば、ぜひ足を運んでみてください。', 'If a shop catches your eye, please stop by.', '마음에 드는 가게가 있다면 꼭 들러 보세요.', '若有感興趣的店家，歡迎親自走一趟。'],
+    'intro.title': ['こんなお店、<br>あったんだ。', 'I never knew<br>this shop was here.', '이런 가게가<br>있었구나.', '原來這裡<br>有這樣的店。'],
+    'intro.p1': ['駅から少し歩けば、<span class="nw">焼きたてのパンの香り。</span>', 'A short walk from the station, the smell of fresh-baked bread.', '역에서 조금만 걸으면, 갓 구운 빵 냄새.', '從車站走幾步，就聞到剛出爐的麵包香。'],
+    'intro.p2': ['ていねいに淹れたコーヒーに、<span class="nw">手しごとのかばん。</span>', 'Carefully brewed coffee, and handmade bags.', '정성껏 내린 커피에, 손으로 만든 가방.', '細心沖煮的咖啡，還有手工製作的包包。'],
+    'intro.p3': ['ひばりヶ丘とそのまわりのお店を、<span class="nw">お店の方の言葉で</span><span class="nw">つないでいます。</span>', 'Here, the shops in and around Hibarigaoka are connected through their own words.', '히바리가오카와 그 주변의 가게를, 가게 분들의 말로 이어 갑니다.', '這裡以店家自己的話，串起雲雀丘及周邊的小店。'],
+    'intro.p4': ['気になる一軒を、<span class="nw">見つけてみてください。</span>', 'Find the one that catches your eye.', '마음에 드는 한 곳을 찾아보세요.', '找找看讓你心動的那一家吧。'],
+    'btn.shops': ['近くのお店を見てみる', 'See the shops', '가게 둘러보기', '看看附近的店'],
     'btn.concept': ['ぐるりのコンセプトを読む', 'Read about GURURI', '구루리의 콘셉트 읽기', '閱讀 GURURI 的理念'],
 
     'shops.title': ['お店をさがす', 'Find shops', '가게 찾기', '尋找店家'],

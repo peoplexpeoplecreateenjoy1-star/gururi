@@ -51,11 +51,12 @@ p{margin:0}
 .wave{display:block;width:100%;height:44px}
 
 /* intro */
-.intro{max-width:1040px;margin:0 auto;padding:88px 24px 64px;display:flex;flex-wrap:wrap;gap:40px 72px;align-items:flex-start;justify-content:center}
+.intro{max-width:1040px;margin:0 auto;padding:96px 24px 80px;display:flex;flex-wrap:wrap;gap:40px 72px;align-items:flex-start;justify-content:center}
 .vert{writing-mode:vertical-rl}
-.intro h2{height:520px;font-size:30px;line-height:1.7;letter-spacing:.18em}
+.intro h2{height:330px;font-size:34px;line-height:1.7;letter-spacing:.18em}
 .intro-body{flex:1 1 380px;min-width:0;max-width:520px;font-size:16px;line-height:2.2}
-.intro-body p:last-of-type{margin-bottom:28px}
+.intro-body > p:nth-last-of-type(2){margin-bottom:28px}
+.intro-body > p.intro-more{margin-bottom:0}
 
 /* shop list */
 .shops{background:var(--beige);padding:48px 24px 96px}
@@ -308,3 +309,9 @@ html.cp-lock,html.cp-lock body{overflow:hidden}
 .fresh{position:absolute;top:12px;left:12px;z-index:3;padding:3px 12px;border-radius:999px;font-size:12px;font-weight:700;line-height:1.7;letter-spacing:.08em;pointer-events:none;box-shadow:0 1px 3px rgba(58,42,36,.18)}
 .fresh-new{background:var(--terra);color:#fff}
 .fresh-upd{background:#fff;color:var(--terra-dk);border:1.5px solid var(--terra)}
+
+/* トップの文章（2026-11-14）：お店の一覧へ下りるボタン＋コンセプトへの小さなリンク */
+html{scroll-behavior:smooth}
+#shops{scroll-margin-top:8px}
+.intro-body p.intro-more{margin:18px 0 0 6px;font-size:14px;line-height:1.8}
+.intro-more a{color:var(--terra-dk);text-underline-offset:4px}
