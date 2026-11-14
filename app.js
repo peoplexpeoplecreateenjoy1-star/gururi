@@ -14,8 +14,55 @@
   if (!grid) return;
 
   var GENRES = ['パン・お菓子', '食事・カフェ', '雑貨・ギフト', '教室・体験', '暮らし'];
-  // 一覧の上の方に先に並べるジャンル（飲食系）
+  /* ───────── 一覧の並び順（2026-11-14・G決定：案1と案2の組み合わせ） ─────────
+     1. 新着・更新のお店がいちばん上（その中では飲食系が先、あとは新しい日付の順）
+     2. 先頭は飲食系：飲食系の軒数の半分（多くても6軒＝パソコンの最初の2段）。新着・更新の飲食系も数に入れる
+     3. そのあとは、上ほど飲食系がやや多く、下ほど少なくなるように、なだらかに混ぜる
+        （全体では、飲食系の割合はだいたい掲載店の割合どおり）
+     同じ種類のお店どうしの順は「日替わりのくじ」。同じ日なら同じ並び、毎日入れ替わる */
   var TOP_GENRES = ['パン・お菓子', '食事・カフェ'];
+  var LEAD_MAX = 6;       // 先頭に並べる飲食系の上限
+  var GRADIENT = 0.2;     // なだらかさ：上の端で＋20%、下の端で－20%
+  function isTop(s) { return TOP_GENRES.indexOf(s.genre) >= 0; }
+  function dayRandom() {
+    var d = new Date(), seed = d.getFullYear() * 10000 + (d.getMonth() + 1) * 100 + d.getDate();
+    return function () {   // mulberry32
+      seed |= 0; seed = seed + 0x6D2B79F5 | 0;
+      var t = Math.imul(seed ^ seed >>> 15, 1 | seed);
+      t = t + Math.imul(t ^ t >>> 7, 61 | t) ^ t;
+      return ((t ^ t >>> 14) >>> 0) / 4294967296;
+    };
+  }
+  function orderShops(list) {
+    // お店ごとのくじの値（同じ日は同じ値。シートの並びに左右されないよう、店名の順で配る）
+    var rnd = dayRandom(), key = {};
+    list.map(function (s) { return s.name; }).slice().sort().forEach(function (n) { key[n] = rnd(); });
+    var byKey = function (a, b) { return key[b.name] - key[a.name]; };
+
+    var fresh = list.filter(isFresh).sort(function (a, b) {
+      if (isTop(a) !== isTop(b)) return isTop(a) ? -1 : 1;
+      if (a.freshDate.getTime() !== b.freshDate.getTime()) return b.freshDate - a.freshDate;
+      return byKey(a, b);
+    });
+    var food = list.filter(function (s) { return !isFresh(s) && isTop(s); }).sort(byKey);
+    var other = list.filter(function (s) { return !isFresh(s) && !isTop(s); }).sort(byKey);
+    var out = fresh.slice();
+
+    // 先頭の飲食系
+    var allFood = list.filter(isTop).length;
+    var lead = Math.min(Math.ceil(allFood / 2), LEAD_MAX) - fresh.filter(isTop).length;
+    while (lead-- > 0 && food.length) out.push(food.shift());
+
+    // 残りを、上ほど飲食系が多めになるように混ぜる
+    var M = food.length + other.length, r = M ? food.length / M : 0, want = 0, placed = 0;
+    for (var i = 0; i < M; i++) {
+      var p = r + GRADIENT * (1 - 2 * (i + 0.5) / M);
+      want += Math.max(0, Math.min(1, p));
+      var takeFood = food.length && (!other.length || placed < Math.round(want));
+      if (takeFood) { out.push(food.shift()); placed++; } else out.push(other.shift());
+    }
+    return out;
+  }
   var STYLE = {
     'パン・お菓子': { bg: '#E4B54A', fg: '#3A2A24', icon: 'bread' },
     '食事・カフェ': { bg: '#D46A3C', fg: '#FFFFFF', icon: 'cup' },
@@ -299,16 +346,7 @@
       return (state.genre === 'all' || s.genre === state.genre) && (state.area === 'all' || s.city === state.area) &&
         (!state.coupon || s.coupon) && matchQ(s, ws);
     });
-    // 並び順（2026-11-14・G決定）
-    //  1. 新着・更新のお店が上（その中では、飲食系 → 新しい日付の順）
-    //  2. そのあと、新着・更新ではないお店（その中でも、飲食系が先。あとはシートの並びのまま）
-    //  飲食系＝写真が映えやすく、入口になりやすいジャンル（TOP_GENRES）
-    list = list.map(function (s, i) { return { s: s, i: i, f: isFresh(s), t: TOP_GENRES.indexOf(s.genre) >= 0 }; }).sort(function (a, b) {
-      if (a.f !== b.f) return a.f ? -1 : 1;
-      if (a.t !== b.t) return a.t ? -1 : 1;
-      if (a.f && b.f && a.s.freshDate.getTime() !== b.s.freshDate.getTime()) return b.s.freshDate - a.s.freshDate;
-      return a.i - b.i;
-    }).map(function (x) { return x.s; });
+    list = orderShops(list);
     grid.innerHTML = list.map(card).join('');
     setupSliders();
     document.getElementById('shop-count').textContent = T('shops.count', { n: list.length, t: vis.length });
