@@ -19,13 +19,16 @@
      2. 先頭は飲食系：飲食系の軒数の半分（多くても6軒＝パソコンの最初の2段）。新着・更新の飲食系も数に入れる
      3. そのあとは、上ほど飲食系がやや多く、下ほど少なくなるように、なだらかに混ぜる
         （全体では、飲食系の割合はだいたい掲載店の割合どおり）
-     同じ種類のお店どうしの順は「日替わりのくじ」。同じ日なら同じ並び、毎日入れ替わる */
+     同じ種類のお店どうしの順は「月替わりのくじ」。同じ月なら同じ並びで、毎月1日に入れ替わる（更新の公開と同じ日）
+     ※ 2026-11-14 から：ふだんはシートの「並び順」タブの順（公開用の「並び順」の列の番号）で並べる。
+        毎月1日に、受付のスクリプトが下と同じルールで並び順タブを並べ替え、手で直すときはタブの行をドラッグする。
+        下の自動の並びは、「並び順」の列がまだないときの予備 */
   var TOP_GENRES = ['パン・お菓子', '食事・カフェ'];
   var LEAD_MAX = 6;       // 先頭に並べる飲食系の上限
   var GRADIENT = 0.2;     // なだらかさ：上の端で＋20%、下の端で－20%
   function isTop(s) { return TOP_GENRES.indexOf(s.genre) >= 0; }
-  function dayRandom() {
-    var d = new Date(), seed = d.getFullYear() * 10000 + (d.getMonth() + 1) * 100 + d.getDate();
+  function monthRandom() {
+    var d = new Date(), seed = d.getFullYear() * 100 + (d.getMonth() + 1);
     return function () {   // mulberry32
       seed |= 0; seed = seed + 0x6D2B79F5 | 0;
       var t = Math.imul(seed ^ seed >>> 15, 1 | seed);
@@ -34,8 +37,15 @@
     };
   }
   function orderShops(list) {
-    // お店ごとのくじの値（同じ日は同じ値。シートの並びに左右されないよう、店名の順で配る）
-    var rnd = dayRandom(), key = {};
+    // 「並び順」の番号があれば、その順（番号のないお店は上に。並び順タブに入れ忘れたお店に気づけるように）
+    if (list.some(function (s) { return s.order; })) {
+      return list.map(function (s, i) { return { s: s, i: i }; }).sort(function (a, b) {
+        return (a.s.order || 0) - (b.s.order || 0) || a.i - b.i;
+      }).map(function (x) { return x.s; });
+    }
+    // お店ごとのくじの値（同じ月は同じ値。シートの並びに左右されないよう、店名の順で配る）
+    var allFood = list.filter(isTop).length;
+    var rnd = monthRandom(), key = {};
     list.map(function (s) { return s.name; }).slice().sort().forEach(function (n) { key[n] = rnd(); });
     var byKey = function (a, b) { return key[b.name] - key[a.name]; };
 
@@ -49,7 +59,6 @@
     var out = fresh.slice();
 
     // 先頭の飲食系
-    var allFood = list.filter(isTop).length;
     var lead = Math.min(Math.ceil(allFood / 2), LEAD_MAX) - fresh.filter(isTop).length;
     while (lead-- > 0 && food.length) out.push(food.shift());
 
@@ -176,6 +185,8 @@
         abroadNote: col(r, 'お客様対応の備考'),
         // クーポン（「クーポン」の列が「出す」で、特典が書いてあるお店だけ、カードにボタンを出す）
         // 新着・更新の札（受付と公開のスクリプトが、公開した日と一緒に書き込む）
+        // 並び順（シートの「並び順」タブで何番目か。公開用の「並び順」の列に式で入る）
+        order: (function (v) { v = parseInt(String(v).replace(/[^0-9]/g, ''), 10); return v > 0 ? v : 0; })(col(r, '並び順')),
         fresh: freshKind(col(r, '新着・更新')),
         freshDate: parseDay(col(r, '新着・更新の日')),
         coupon: /出す|あり|^yes$|^true$/i.test(col(r, 'クーポン')) && !!col(r, 'クーポンの特典'),
