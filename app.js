@@ -540,7 +540,7 @@
     try { return new Intl.DateTimeFormat(LOCALE[I18N.lang] || 'ja-JP', o).format(d); }
     catch (e) { return d.getFullYear() + '/' + (d.getMonth() + 1) + '/' + d.getDate(); }
   }
-  var cpBox = null, cpLastFocus = null, cpOpenIdx = -1;
+  var cpBox = null, cpLastFocus = null, cpOpenIdx = -1, cpPushed = false;
   function couponHtml(s) {
     var lg = I18N.lang;
     var nameTr = (lg !== 'ja' && s.tr && s.tr[lg] && s.tr[lg].name) || (I18N.shopName ? I18N.shopName(s.name) : '') ||
@@ -587,7 +587,8 @@
     cpBox.hidden = false;
     document.documentElement.classList.add('cp-lock');
     var x = cpBox.querySelector('.cp-close'); if (x) x.focus();
-    if (!fromHistory) { try { history.pushState({ coupon: idx }, '', '#coupon=' + encodeURIComponent(s.name)); } catch (e) {} }
+    cpPushed = false;
+    if (!fromHistory) { try { history.pushState({ coupon: idx }, '', location.pathname + location.search + '#coupon=' + encodeURIComponent(s.name)); cpPushed = true; } catch (e) {} }
     // 開かれた記録（GA4）
     try { if (typeof gtag === 'function') gtag('event', 'coupon_open', { shop_name: s.name }); } catch (e) {}
   }
@@ -595,7 +596,12 @@
     if (!cpBox || cpBox.hidden) return;
     cpBox.hidden = true; cpOpenIdx = -1;
     document.documentElement.classList.remove('cp-lock');
-    if (!fromHistory && /^#coupon=/.test(location.hash)) { try { history.back(); } catch (e) {} }
+    // サイトの中で開いたときは「戻る」で閉じる。Instagramのストーリーなど、クーポン画面のURLから直接来たときは、
+    // 「戻る」を使うとサイトから出てしまうので、URLから #coupon=… を外すだけにして、ホームの一覧を見せる
+    if (!fromHistory && /^#coupon=/.test(location.hash)) {
+      try { if (cpPushed) history.back(); else history.replaceState(null, '', location.pathname + location.search); } catch (e) {}
+    }
+    cpPushed = false;
     if (cpLastFocus && cpLastFocus.focus) cpLastFocus.focus();
   }
   var cpBanner = document.getElementById('cp-banner');
