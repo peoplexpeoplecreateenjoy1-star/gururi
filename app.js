@@ -617,6 +617,17 @@
     if (i >= 0) openCoupon(i, true);
   });
   // #coupon=店名 のリンクで開いたとき（お店の一覧が読み込まれてから開く）
+  // Short.io などの短いリンクを通ると「#」から後ろが消えることがあるため、?coupon=店名・?list=coupons でも開けるようにする。
+  // 開いたらURLは #coupon=… / #coupons の形にそろえる（そのあとの「閉じる」などの動きは同じ）
+  (function () {
+    try {
+      var q = new URLSearchParams(location.search), c = q.get('coupon'), l = q.get('list');
+      if (!c && l !== 'coupons') return;
+      q.delete('coupon'); q.delete('list');
+      var rest = q.toString();
+      history.replaceState(null, '', location.pathname + (rest ? '?' + rest : '') + (c ? '#coupon=' + encodeURIComponent(c) : '#coupons'));
+    } catch (e) {}
+  })();
   function openCouponFromHash() {
     var m = location.hash.match(/^#coupon=(.+)$/); if (!m) return;
     var name = decodeURIComponent(m[1]);
