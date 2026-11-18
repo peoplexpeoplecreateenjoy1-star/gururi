@@ -9,9 +9,9 @@ window.GURURI_CONFIG = {
   sheetCsvUrl: "https://docs.google.com/spreadsheets/d/e/2PACX-1vTb4L2OZSQFfu-RAwg1j-pEgIUCoQcEVFIwc9Fb_vnci79DRBBWNEHPAe5cbQke9Hi3ruHSx_Z0ez3x/pub?gid=1209506581&single=true&output=csv",
 
   // 各ボタンのリンク先
-  instagram: "https://www.instagram.com/gururi_hibarigaoka/",
-  wazanohito: "https://peoplexpeoplecreateenjoy1-star.github.io/wazanohito/",
-  joinForm: "https://docs.google.com/forms/d/e/1FAIpQLSfrWgaeeqYiQwN2ok3BROZ4AYDJDopzVG8R2H3lblqwTe_POQ/viewform?usp=header",
-  torimichHome: "https://sites.google.com/view/torimich",
-  latteInstagram: "https://www.instagram.com/seibu_cafe/"
+  instagram: "https://ykt5da.s.gy/insta-gururi",
+  wazanohito: "https://ykt5da.s.gy/wazanohito-explore",
+  joinForm: "https://ykt5da.s.gy/google-form-access",
+  torimichHome: "https://ykt5da.s.gy/torimich-explore",
+  latteInstagram: "https://ykt5da.s.gy/seibu-cafe"
 };
