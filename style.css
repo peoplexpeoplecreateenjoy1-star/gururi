@@ -324,3 +324,14 @@ html{scroll-behavior:smooth}
 @media (max-width:440px){html:not([lang="ja"]) .brand img{height:32px}html:not([lang="ja"]) .brand .brand-area{font-size:13px;letter-spacing:.03em}html:not([lang="ja"]) .brand{gap:7px}html:not([lang="ja"]) .hd-in{column-gap:10px}}
 @media (max-width:385px){.hd-in{column-gap:8px}.lang{padding:0 10px;gap:4px}.lang svg{width:16px;height:16px}.brand{gap:8px}.brand img{height:34px}.brand .brand-area{font-size:15px;letter-spacing:.05em}
   html:not([lang="ja"]) .brand img{height:28px}html:not([lang="ja"]) .brand .brand-area{font-size:12px;letter-spacing:.02em}html:not([lang="ja"]) .brand{gap:6px}}
+
+/* 日本語の改行位置（2026-11-20・G指示）：文の切れ目（<wbr>）でだけ折り返す。入りきらないときだけ文字の途中で折り返す */
+html[lang="ja"] .c-lead p,html[lang="ja"] .sec-title,html[lang="ja"] .vcard h3,html[lang="ja"] .vcard p,html[lang="ja"] .next-tx p,html[lang="ja"] .tcard p,html[lang="ja"] .cta h2,html[lang="ja"] .waza-tx h2,html[lang="ja"] .waza-tx p{word-break:keep-all;overflow-wrap:anywhere}
+@media (max-width:720px){
+  .view-tx{font-size:16px;line-height:2.2;letter-spacing:.08em}
+  html[lang="ja"] .view-tx p{word-break:keep-all;overflow-wrap:anywhere}   /* スマホは横書きなので、ここだけ切れ目で折り返す（パソコンの縦書きは今のまま） */
+  .next-tx{font-size:15px}
+  .c-lead p{font-size:15px;line-height:2.2}   /* 「まだ扉を開けたことのないお店があります。」を1行に収める */
+  .cta h2{font-size:22px;letter-spacing:.06em}
+  .sec-title{font-size:28px;letter-spacing:.08em}
+}
