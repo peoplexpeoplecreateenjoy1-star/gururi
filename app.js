@@ -271,7 +271,14 @@
       }).join('');
     }
     var badge = isFresh(s) ? '<span class="fresh fresh-' + s.fresh + '">' + esc(T('fresh.' + s.fresh)) + '</span>' : '';
-    var h = '<article class="card"><div class="card-pic' + (s.photos.length > 1 ? ' is-slider' : '') + '" style="background:' + st.bg + '">' + pic + badge + '</div><div class="card-body">';
+    var ctrl = '';
+    if (s.photos.length > 1) {
+      // 前後の写真ボタンと、何枚目かの点（2026-11-20・ラテさんの意見：見逃した写真をすぐ見返せるように）
+      ctrl = '<button type="button" class="ph-nav ph-prev" aria-label="' + esc(T('photo.prev')) + '"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M15 5l-7 7 7 7"/></svg></button>'
+        + '<button type="button" class="ph-nav ph-next" aria-label="' + esc(T('photo.next')) + '"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M9 5l7 7-7 7"/></svg></button>'
+        + '<span class="ph-dots" aria-hidden="true">' + s.photos.map(function (p, i) { return '<i' + (i === 0 ? ' class="is-on"' : '') + '></i>'; }).join('') + '</span>';
+    }
+    var h = '<article class="card"><div class="card-pic' + (s.photos.length > 1 ? ' is-slider' : '') + '" style="background:' + st.bg + '">' + pic + badge + ctrl + '</div><div class="card-body">';
     var mapUrl = /^https?:\/\//i.test(s.map) ? s.map
       : 'https://www.google.com/maps/search/?api=1&query=' + encodeURIComponent([s.name, s.sub, s.city].filter(Boolean).join(' '));
     var place = s.city
@@ -385,7 +392,9 @@
   }
 
   // 写真の切り替え（約4秒ごとに、ゆっくり重ねるように切り替える。カードごとに少しずつずらす）
-  var INTERVAL = 4500;
+  var INTERVAL = 3200;   // 1枚を見せる時間（2026-11-20：4.5秒→3.2秒。ゆっくりすぎて複数あると気づかれにくかったため）
+  var FIRST = 1800;      // 画面に入ってから、最初に切り替わるまで
+  var HOLD = 12000;   // 手で動かしたあと、自動の切り替えを待つ時間
   var sliders = [];
   var reduceMotion = window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches;
 
@@ -394,29 +403,46 @@
     sliders = [];
     grid.querySelectorAll('.card-pic.is-slider').forEach(function (box, idx) {
       var imgs = box.querySelectorAll('.slide');
-      var sl = { i: 0, timer: null, visible: false, io: null };
-      function show(k) {
+      var dots = box.querySelectorAll('.ph-dots i');
+      var sl = { i: 0, timer: null, visible: false, io: null, held: 0 };
+      // dir：0＝自動（今までどおりふわっと重ねる）／1＝次へ（右から入る）／-1＝前へ（左から入る）
+      function show(k, dir) {
         var prev = sl.i;
         sl.i = (k + imgs.length) % imgs.length;
         imgs.forEach(function (im, j) {
+          im.classList.remove('from-r', 'from-l');
           im.classList.toggle('is-prev', j === prev && j !== sl.i);
           im.classList.toggle('is-on', j === sl.i);
           if (j === sl.i) im.removeAttribute('aria-hidden'); else im.setAttribute('aria-hidden', 'true');
         });
+        if (dir && !reduceMotion) { void imgs[sl.i].offsetWidth; imgs[sl.i].classList.add(dir > 0 ? 'from-r' : 'from-l'); }
+        dots.forEach(function (d, j) { d.classList.toggle('is-on', j === sl.i); });
       }
       function schedule(delay) {
         clearTimeout(sl.timer);
         if (reduceMotion || !sl.visible || document.hidden) return;
-        sl.timer = setTimeout(function () { show(sl.i + 1); schedule(INTERVAL); }, delay);
+        sl.timer = setTimeout(function () { show(sl.i + 1, 0); schedule(INTERVAL); }, delay);
       }
+      // 手で動かしたら、しばらく自動の切り替えを止めて、ゆっくり見られるようにする
+      function go(dir) { show(sl.i + dir, dir); schedule(HOLD); }
       sl.schedule = schedule;
+      box.querySelector('.ph-prev').addEventListener('click', function (e) { e.preventDefault(); go(-1); });
+      box.querySelector('.ph-next').addEventListener('click', function (e) { e.preventDefault(); go(1); });
+      // 指で左右にすべらせて切り替え（縦のスクロールはそのまま）
+      var sx = null, sy = 0;
+      box.addEventListener('touchstart', function (e) { if (e.touches.length !== 1) { sx = null; return; } sx = e.touches[0].clientX; sy = e.touches[0].clientY; }, { passive: true });
+      box.addEventListener('touchend', function (e) {
+        if (sx === null) return;
+        var t = e.changedTouches[0], dx = t.clientX - sx, dy = t.clientY - sy; sx = null;
+        if (Math.abs(dx) > 40 && Math.abs(dx) > Math.abs(dy) * 1.5) go(dx < 0 ? 1 : -1);
+      }, { passive: true });
       if ('IntersectionObserver' in window) {
         sl.io = new IntersectionObserver(function (es) {
           sl.visible = es[0].isIntersecting;
-          if (sl.visible) schedule(INTERVAL + (idx % 5) * 700); else clearTimeout(sl.timer);
+          if (sl.visible) schedule(FIRST + (idx % 3) * 400); else clearTimeout(sl.timer);
         }, { threshold: 0.4 });
         sl.io.observe(box);
-      } else { sl.visible = true; schedule(INTERVAL + (idx % 5) * 700); }
+      } else { sl.visible = true; schedule(FIRST + (idx % 3) * 400); }
       sliders.push(sl);
     });
   }

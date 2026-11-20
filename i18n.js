@@ -73,6 +73,8 @@
     'error': ['お店の情報を読み込めませんでした。時間をおいて、もう一度開いてみてください。', 'We couldn’t load the shop information. Please try again in a little while.', '가게 정보를 불러오지 못했습니다. 잠시 후 다시 열어 주세요.', '無法載入店家資訊，請稍後再試一次。'],
     'map.aria': ['{name}の場所をGoogleマップで見る（{city}）', 'See where {name} is on Google Maps ({city})', '{name} 위치를 Google 지도에서 보기 ({city})', '在 Google 地圖查看 {name} 的位置（{city}）'],
     'photo.alt': ['{name}の写真', 'Photo of {name}', '{name} 사진', '{name} 的照片'],
+    'photo.prev': ['前の写真', 'Previous photo', '이전 사진', '上一張照片'],
+    'photo.next': ['次の写真', 'Next photo', '다음 사진', '下一張照片'],
 
     'ig.title': ['街のお気に入りが、もっと見つかるように。', 'So you can find more favorite spots around town.', '동네의 단골집을 더 많이 찾을 수 있도록.', '讓你在街區找到更多心頭好。'],
     'ig.p1': ['ぐるりには、これからもすてきなお店が次々と加わっていく予定です。', 'More wonderful shops will keep joining GURURI.', '구루리에는 앞으로도 멋진 가게들이 계속 더해질 예정입니다.', 'GURURI 之後也會陸續加入更多美好的店家。'],

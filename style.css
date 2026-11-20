@@ -74,7 +74,7 @@ p{margin:0}
 .card-pic img{width:100%;height:100%;object-fit:cover}
 .card-pic .slide{position:absolute;inset:0;opacity:0;transform:scale(1);transition:none}
 .card-pic .slide.is-prev{opacity:1;z-index:1;transform:scale(1.04);transition:none}
-.card-pic .slide.is-on{opacity:1;z-index:2;transform:scale(1.04);transition:opacity 1.4s ease,transform 6s linear}
+.card-pic .slide.is-on{opacity:1;z-index:2;transform:scale(1.04);transition:opacity .9s ease,transform 4.5s linear}
 @media (prefers-reduced-motion:reduce){.card-pic .slide,.card-pic .slide.is-on,.card-pic .slide.is-prev{transform:none;transition:none}}
 .card-pic svg{width:88px;height:88px}
 .card-body{padding:22px 24px 24px;display:flex;flex-direction:column;gap:10px;flex-grow:1}
@@ -351,3 +351,19 @@ body{font-weight:500}
   .tcard{padding:28px 20px}
   .pp-doc{font-size:16px}
 }
+
+/* 写真の前後ボタン・何枚目かの点・指でのスライド（2026-11-20・ラテさんの意見） */
+.card-pic.is-slider{touch-action:pan-y}
+.ph-nav{position:absolute;top:50%;z-index:4;width:44px;height:44px;margin-top:-22px;padding:0;border:0;border-radius:999px;background:rgba(255,255,255,.82);box-shadow:0 1px 4px rgba(58,42,36,.2);display:flex;align-items:center;justify-content:center;cursor:pointer;color:var(--ink)}
+.ph-nav svg{width:20px;height:20px;fill:none;stroke:currentColor;stroke-width:2.2;stroke-linecap:round;stroke-linejoin:round}
+.ph-prev{left:8px}.ph-next{right:8px}
+.ph-nav:hover{background:#fff}
+@media (hover:hover){.card-pic .ph-nav{opacity:0;transition:opacity .2s}.card-pic:hover .ph-nav,.card-pic .ph-nav:focus-visible{opacity:1}}
+.ph-dots{position:absolute;left:0;right:0;bottom:12px;z-index:4;display:flex;justify-content:center;gap:7px;pointer-events:none}
+.ph-dots i{width:7px;height:7px;border-radius:50%;background:rgba(255,255,255,.6);box-shadow:0 0 2px rgba(58,42,36,.35);transition:background .3s,transform .3s}
+.ph-dots i.is-on{background:#fff;transform:scale(1.25)}
+.card-pic .slide.is-on.from-r,.card-pic .slide.is-on.from-l{opacity:1;transition:none}
+.card-pic .slide.is-on.from-r{animation:ph-in-r .45s ease both}
+.card-pic .slide.is-on.from-l{animation:ph-in-l .45s ease both}
+@keyframes ph-in-r{from{transform:translateX(100%) scale(1.04)}to{transform:translateX(0) scale(1.04)}}
+@keyframes ph-in-l{from{transform:translateX(-100%) scale(1.04)}to{transform:translateX(0) scale(1.04)}}
