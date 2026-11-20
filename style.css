@@ -346,7 +346,8 @@ body{font-weight:500}
 .pp-doc{font-size:16px}
 @media (max-width:720px){
   .values{padding-left:16px;padding-right:16px}
-  .vcard-body{padding:28px 18px 30px}   /* 「近くの気になるお店を並べています。」を1行に収める */
+  .vcard-body{padding:28px 14px 30px}   /* 「花屋さんのとなりに、フォトスタジオ。」「近くの気になるお店を並べています。」を1行に収める */
+  .vcard p{letter-spacing:.01em}
   .tcard{padding:28px 20px}
   .pp-doc{font-size:16px}
 }
