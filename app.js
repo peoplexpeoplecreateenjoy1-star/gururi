@@ -11,6 +11,19 @@
     if (url) a.href = url;
   });
 
+  // 「掲載について」ページ：数字で見るぐるり（config.js の joinStats.show が true のときだけ出す）
+  var stats = document.getElementById('jn-stats'), JS = CFG.joinStats || {};
+  if (stats && JS.show === true) {
+    stats.querySelectorAll('[data-stat]').forEach(function (el) { var v = JS[el.getAttribute('data-stat')]; if (v) el.textContent = v; });
+    stats.hidden = false;
+  }
+  // 「掲載を申し込む」が押された回数を GA4 で数える（イベント名 join_click）
+  document.querySelectorAll('[data-track]').forEach(function (a) {
+    a.addEventListener('click', function () {
+      try { if (typeof gtag === 'function') gtag('event', a.getAttribute('data-track'), { link_url: a.href, page: document.body.getAttribute('data-page') || '' }); } catch (e) {}
+    });
+  });
+
   var grid = document.getElementById('shop-grid');
   if (!grid) return;
 

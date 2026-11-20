@@ -17,5 +17,15 @@ window.GURURI_CONFIG = {
 
   // 「わざのひと」への案内（上のメニューと、ページ下の紹介）を出すかどうか。
   // 出すときは false を true に書き換えるだけ（2026-11-20・G決定：わざのひとが整うまで隠す）
-  showWazanohito: false
+  showWazanohito: false,
+
+  // 「掲載について」ページの「数字で見るぐるり」（2026-11-21・G決定：数字がそろうまで隠す）
+  // 出すときは show を true に。数字は "" の中を書き換える（例：views: "1,200回"）。asOf は「いつの数字か」
+  joinStats: {
+    show: false,
+    views: "",
+    posters: "",
+    followers: "",
+    asOf: ""
+  }
 };
