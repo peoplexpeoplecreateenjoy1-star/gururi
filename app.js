@@ -4,6 +4,7 @@
   function T(k, v) { return I18N.t(k, v); }
   function W(w) { return I18N.word(w); }
 
+  if (CFG.showWazanohito === true) document.documentElement.classList.add('show-waza');
   // config.js のリンク先を、data-link="..." のついたリンクに入れる
   document.querySelectorAll('[data-link]').forEach(function (a) {
     var url = CFG[a.getAttribute('data-link')];

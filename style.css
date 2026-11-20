@@ -375,3 +375,10 @@ body{font-weight:500}
 /* いちばん下のロゴ：押すとページの上へ戻る */
 a.ft-brand{text-decoration:none;align-self:flex-start;border-radius:8px}
 a.ft-brand:hover{opacity:.85}
+
+/* わざのひとへの案内は、config.js の showWazanohito が true のときだけ出す */
+html:not(.show-waza) [data-waza]{display:none !important}
+/* スマホの上のメニュー：「お店をさがす・ぐるりについて・掲載について」を横1列に（2026-11-20） */
+@media (max-width:720px){.nav{gap:4px 12px;justify-content:space-between}}
+@media (max-width:374px){.nav{font-size:14px;gap:4px 8px}.hd-in{padding-left:16px;padding-right:16px}}
+@media (max-width:400px){html:not([lang="ja"]) .nav{font-size:14px;gap:4px 8px}}

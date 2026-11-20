@@ -13,5 +13,9 @@ window.GURURI_CONFIG = {
   wazanohito: "https://ykt5da.s.gy/wazanohito-explore",
   joinForm: "https://ykt5da.s.gy/google-form-access",
   torimichHome: "https://ykt5da.s.gy/torimich-explore",
-  latteInstagram: "https://ykt5da.s.gy/seibu-cafe"
+  latteInstagram: "https://ykt5da.s.gy/seibu-cafe",
+
+  // 「わざのひと」への案内（上のメニューと、ページ下の紹介）を出すかどうか。
+  // 出すときは false を true に書き換えるだけ（2026-11-20・G決定：わざのひとが整うまで隠す）
+  showWazanohito: false
 };
