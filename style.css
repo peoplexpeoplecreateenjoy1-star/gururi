@@ -328,10 +328,24 @@ html{scroll-behavior:smooth}
 /* 日本語の改行位置（2026-11-20・G指示）：文の切れ目（<wbr>）でだけ折り返す。入りきらないときだけ文字の途中で折り返す */
 html[lang="ja"] .c-lead p,html[lang="ja"] .sec-title,html[lang="ja"] .vcard h3,html[lang="ja"] .vcard p,html[lang="ja"] .next-tx p,html[lang="ja"] .tcard p,html[lang="ja"] .cta h2,html[lang="ja"] .waza-tx h2,html[lang="ja"] .waza-tx p{word-break:keep-all;overflow-wrap:anywhere}
 @media (max-width:720px){
-  .view-tx{font-size:16px;line-height:2.2;letter-spacing:.08em}
+  .view-tx{line-height:2.1;letter-spacing:.06em}
   html[lang="ja"] .view-tx p{word-break:keep-all;overflow-wrap:anywhere}   /* スマホは横書きなので、ここだけ切れ目で折り返す（パソコンの縦書きは今のまま） */
-  .next-tx{font-size:15px}
-  .c-lead p{font-size:15px;line-height:2.2}   /* 「まだ扉を開けたことのないお店があります。」を1行に収める */
-  .cta h2{font-size:22px;letter-spacing:.06em}
+  .cta h2{font-size:19px;letter-spacing:.04em}
+  .cta-in{padding:48px 20px}
   .sec-title{font-size:28px;letter-spacing:.08em}
+}
+
+/* 読みやすい文字の大きさ（2026-11-20・G指示：40〜60代の方に負担のない大きさに）
+   本文は17px・やや太め（500）。行間は少し詰めて、字間も控えめにし、1行に入る文字数を確保する */
+body{font-weight:500}
+.c-lead p,.vcard p,.tcard p,.next-tx,.view-tx,.waza p{font-size:17px;line-height:2;letter-spacing:.03em}
+.text{font-size:17px;line-height:1.9}
+.info{font-size:15px}
+.meta,.subname,.origname,.t-sub,.abroad-note{font-size:14px}
+.links a{font-size:15px}
+.pp-doc{font-size:16px}
+@media (max-width:720px){
+  .vcard-body{padding:28px 22px 30px}
+  .tcard{padding:28px 20px}
+  .pp-doc{font-size:16px}
 }

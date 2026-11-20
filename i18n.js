@@ -80,13 +80,13 @@
     'ig.btn': ['Instagramをフォローする', 'Follow on Instagram', 'Instagram 팔로우하기', '追蹤 Instagram'],
 
     'waza.title': ['人と技に<wbr>目を向けたページ<wbr>「わざのひと」', 'WAZANOHITO: a page about people and their craft', '사람과 기술에 주목한 페이지 ‘WAZANOHITO’', '關注人與技藝的頁面「WAZANOHITO」'],
-    'waza.p': ['ぐるりは、<wbr>人と地域に<wbr>目を向けたページです。<wbr>人と技に<wbr><span class="nw">目を向けたページが、</span><wbr><span class="nw">「わざのひと」です。</span><wbr>ひとつの技に<wbr>向き合い続けている<wbr>方たちを、<wbr>その技とともに<wbr>紹介しています。', 'GURURI looks at people and their neighborhood. WAZANOHITO looks at people and their craft, introducing people who keep devoting themselves to a single craft, together with that craft.', '구루리는 사람과 지역에 주목한 페이지입니다. 사람과 기술에 주목한 페이지가 ‘WAZANOHITO’입니다. 하나의 기술과 꾸준히 마주하고 있는 분들을 그 기술과 함께 소개합니다.', 'GURURI 是關注人與地方的頁面。關注人與技藝的頁面則是「WAZANOHITO」，介紹持續專注於一項技藝的人們，以及他們的技藝。'],
+    'waza.p': ['ぐるりは、<wbr>人と地域に<wbr>目を向けたページです。<wbr>人と技に<wbr><span class="nw">目を向けたページが、</span><wbr><span class="nw">「わざのひと」です。</span><wbr>ひとつの技に<wbr>向き合っている<wbr>方たちを、<wbr>その技とともに<wbr>紹介しています。', 'GURURI looks at people and their neighborhood. WAZANOHITO looks at people and their craft, introducing people devoted to a single craft, together with that craft.', '구루리는 사람과 지역에 주목한 페이지입니다. 사람과 기술에 주목한 페이지가 ‘WAZANOHITO’입니다. 하나의 기술과 마주하고 있는 분들을 그 기술과 함께 소개합니다.', 'GURURI 是關注人與地方的頁面。關注人與技藝的頁面則是「WAZANOHITO」，介紹專注於一項技藝的人們，以及他們的技藝。'],
     'waza.btn': ['わざのひとを見る', 'See WAZANOHITO', 'WAZANOHITO 보기', '查看 WAZANOHITO'],
     'join.title': ['<span class="nw">ぐるり ひばりヶ丘への</span><span class="nw">掲載をご希望の</span><span class="nw">お店の方へ</span>', 'For shops interested in being featured on GURURI Hibarigaoka', '구루리 히바리가오카 게재를 희망하시는 가게 분들께', '想刊登於 GURURI Hibarigaoka 的店家'],
     'join.btn': ['掲載について見る', 'Learn about listing', '게재 안내 보기', '查看刊登說明'],
 
     'c.hero': ['いつもの道に、<br>寄り道をひとつ。', 'One small detour<br>on your everyday path.', '늘 다니던 길에,<br>잠깐 들를 곳 하나.', '在熟悉的路上，<br>多一個順道的去處。'],
-    'c.lead1': ['毎日通る道にも、<wbr>まだ扉を開けたことのないお店があります。', 'Even on the streets you walk every day, there are shops whose doors you have never opened.', '매일 지나는 길에도 아직 문을 열어 본 적 없는 가게가 있습니다.', '即使是每天經過的路上，也有還沒推開門走進去過的店。'],
+    'c.lead1': ['毎日通る道にも、<wbr>まだ扉を開けたことのない<wbr>お店があります。', 'Even on the streets you walk every day, there are shops whose doors you have never opened.', '매일 지나는 길에도 아직 문을 열어 본 적 없는 가게가 있습니다.', '即使是每天經過的路上，也有還沒推開門走進去過的店。'],
     'c.lead2': ['<span class="nw">ぐるり ひばりヶ丘は、</span><wbr>そんなお店を<wbr>ひとつずつ<wbr>紹介している<wbr>ページです。', 'GURURI Hibarigaoka introduces those shops, one at a time.', '구루리 히바리가오카는 그런 가게를 하나씩 소개하는 페이지입니다.', 'GURURI Hibarigaoka 就是一間一間介紹這些店家的頁面。'],
     'c.values': ['ぐるりが<wbr>大切にしていること', 'What GURURI values', '구루리가 소중히 여기는 것', 'GURURI 重視的事'],
     'v1.h': ['お店の方の言葉で', 'In the shop’s own words', '가게 분들의 말 그대로', '用店家自己的話'],
@@ -94,7 +94,7 @@
     'v2.h': ['毎月、すこしずつ新しく', 'A little new, every month', '매달 조금씩 새롭게', '每個月，一點一點更新'],
     'v2.p': ['お店の情報は<wbr>毎月更新し、<wbr>あたらしく<wbr>加わったお店も<wbr>ご紹介しています。', 'Shop information is updated every month, and we introduce newly joined shops too.', '가게 정보는 매달 업데이트하며, 새로 합류한 가게도 소개합니다.', '店家資訊每月更新，也會介紹新加入的店家。'],
     'v3.h': ['垣根をこえて、となりに', 'Side by side, across boundaries', '경계를 넘어, 나란히', '跨越界線，比鄰而居'],
-    'v3.p': ['カフェのとなりに、<wbr>かばん屋さん。<wbr>花屋さんのとなりに、<wbr>フォトスタジオ。<wbr>業種や市の<wbr>境目にとらわれず、<wbr>近くの<wbr>気になるお店を<wbr>並べています。', 'A bag shop next to a café. A photo studio next to a flower shop. We place interesting nearby shops side by side, regardless of business type or city lines.', '카페 옆에 가방 가게, 꽃집 옆에 사진관. 업종이나 시의 경계에 얽매이지 않고, 가까이 있는 마음 가는 가게들을 나란히 소개합니다.', '咖啡館旁邊是包包店，花店旁邊是照相館。不拘業種或市界，把附近令人好奇的店家並排介紹。'],
+    'v3.p': ['カフェのとなりに、<wbr>かばん屋さん。<br>花屋さんのとなりに、<wbr>フォトスタジオ。<br>業種や市の<wbr>境目にとらわれず、<br>近くの気になるお店を<br>並べています。', 'A bag shop next to a café. A photo studio next to a flower shop. We place interesting nearby shops side by side, regardless of business type or city lines.', '카페 옆에 가방 가게, 꽃집 옆에 사진관. 업종이나 시의 경계에 얽매이지 않고, 가까이 있는 마음 가는 가게들을 나란히 소개합니다.', '咖啡館旁邊是包包店，花店旁邊是照相館。不拘業種或市界，把附近令人好奇的店家並排介紹。'],
     'view.h': ['目指している景色', 'The scene we hope for', '우리가 그리는 풍경', '我們嚮往的風景'],
     'view.p1': ['訪れた方が、<wbr>心から楽しんでくださること。', 'That everyone who visits truly enjoys their time.', '찾아오신 분들이 진심으로 즐거워하시는 것.', '讓來訪的人打從心底感到愉快。'],
     'view.p2': ['その時間が、<wbr>お店の力になり、', 'That this time becomes a source of strength for the shops,', '그 시간이 가게의 힘이 되고,', '讓這段時光成為店家的力量，'],
@@ -115,7 +115,7 @@
     'ft.op': ['運営：<span class="nw">TORIMICH（通り道）</span>・<span class="nw">ラテさん｜</span><span class="nw">西武線カフェさんぽ</span>', 'Run by <span class="nw">TORIMICH</span> and <span class="nw">Latte |</span> <span class="nw">Seibu-sen Cafe Sanpo</span>', '운영: <span class="nw">TORIMICH</span> · <span class="nw">라테 님｜</span><span class="nw">세이부선 카페 산책</span>', '營運：<span class="nw">TORIMICH</span>・<span class="nw">Latte｜</span><span class="nw">西武線咖啡散步</span>'],
     'team.t.link': ['ウェブサイト', 'Website', '웹사이트', '網站'],
     'next.p3': ['地域の学校や<wbr>お店と一緒に、<wbr>まちで過ごす時間が<wbr>もっと楽しくなる<wbr>企画も<wbr>考えています。', 'We are also planning projects with local schools and shops to make time in town even more enjoyable.', '지역 학교, 가게와 함께 마을에서 보내는 시간이 더 즐거워지는 기획도 준비하고 있습니다.', '也正在與當地學校和店家一起，構思讓在街區度過的時光更加愉快的企劃。'],
-    'cta.h': ['気になるお店が<wbr>見つかったら、<br>いつもの道の途中で、<wbr>ふらりと<wbr>寄ってみてください。', 'When a shop catches your eye,<br>drop by on your usual way.', '마음에 드는 가게를 찾았다면,<br>늘 다니던 길에 훌쩍 들러 보세요.', '找到感興趣的店家時，<br>就在平常的路上順道走進去看看吧。'],
+    'cta.h': ['気になるお店が<wbr>見つかったら、<br>いつもの道の途中で、<wbr><span class="nw">ふらりと寄ってみてください。</span>', 'When a shop catches your eye,<br>drop by on your usual way.', '마음에 드는 가게를 찾았다면,<br>늘 다니던 길에 훌쩍 들러 보세요.', '找到感興趣的店家時，<br>就在平常的路上順道走進去看看吧。'],
     'cta.btn': ['ぐるりを見る', 'Explore GURURI', '구루리 둘러보기', '瀏覽 GURURI']
   };
 
