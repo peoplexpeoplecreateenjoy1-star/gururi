@@ -67,6 +67,7 @@
     'search.label': ['キーワードでさがす', 'Search by keyword', '키워드로 찾기', '以關鍵字搜尋'],
     'search.ph': ['店名やキーワードでさがす', 'Search by name or keyword', '가게 이름이나 키워드로 찾기', '以店名或關鍵字搜尋'],
     'search.hint': ['例：ベーグル、書道', 'e.g. bagel, calligraphy', '예: 베이글, 서예', '例：貝果、書法'],
+    'ft.totop': ['ページのいちばん上へ戻る', 'Back to top', '맨 위로 돌아가기', '回到頁面頂端'],
     'search.clear': ['キーワードを消す', 'Clear search', '검색어 지우기', '清除搜尋'],
     'empty.q': ['「{q}」に当てはまるお店は見つかりませんでした。ほかの言葉でもお試しください。', 'No shops found for “{q}”. Try another word.', '“{q}”에 해당하는 가게를 찾지 못했습니다. 다른 단어로 찾아보세요.', '找不到符合「{q}」的店家，請試試其他關鍵字。'],
     'loading': ['お店の情報を読み込んでいます…', 'Loading shops…', '가게 정보를 불러오는 중…', '正在載入店家資訊…'],
@@ -232,3 +233,14 @@
   }
   if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', init); else init();
 })();
+
+// いちばん下のロゴを押すと、同じページのいちばん上へ戻る（2026-11-20・G指示）
+document.addEventListener('click', function (e) {
+  var a = e.target.closest && e.target.closest('[data-totop]');
+  if (!a) return;
+  e.preventDefault();
+  var still = window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+  window.scrollTo({ top: 0, behavior: still ? 'auto' : 'smooth' });
+  var first = document.querySelector('header a, header button');
+  if (first) first.focus({ preventScroll: true });
+});

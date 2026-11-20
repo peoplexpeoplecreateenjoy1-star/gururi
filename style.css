@@ -371,3 +371,7 @@ body{font-weight:500}
 /* 検索窓の入力例（2026-11-20・ラテさんの意見：窓の中では途中で切れていたため、窓の下に出す） */
 .search{margin-bottom:8px}
 .search-hint{max-width:560px;margin:0 0 20px;padding-left:22px;font-size:14px;color:var(--sub);letter-spacing:.04em}
+
+/* いちばん下のロゴ：押すとページの上へ戻る */
+a.ft-brand{text-decoration:none;align-self:flex-start;border-radius:8px}
+a.ft-brand:hover{opacity:.85}
