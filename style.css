@@ -402,3 +402,45 @@ html:not(.show-waza) [data-waza]{display:none !important}
   .cta{padding-bottom:40px}
 }
 html[lang="ja"] .band-ig h2,html[lang="ja"] .band-ig p{word-break:keep-all;overflow-wrap:anywhere}
+
+/* このお店を送る（2026-11-20・ラテさんの提案）：カードの右上の矢印マーク → 下から送り先を選ぶ画面 */
+.card-body{position:relative}
+.share-ic{position:absolute;top:10px;right:10px;width:48px;height:48px;padding:0;border:0;border-radius:50%;background:none;color:var(--terra-dk);display:flex;flex-direction:column;align-items:center;justify-content:center;gap:1px;cursor:pointer;font-family:inherit}
+.share-ic svg{width:28px;height:28px}
+.share-ic span{font-size:12px;font-weight:700;letter-spacing:.06em;line-height:1.2}
+.share-ic:hover{background:var(--kinari)}
+.share-ic:focus-visible{outline:3px solid rgba(94,154,78,.5);outline-offset:1px}
+.card-body .meta{padding-right:52px}
+.sh-overlay{position:fixed;inset:0;z-index:150;display:flex;align-items:flex-end;justify-content:center;background:rgba(58,42,36,0);transition:background .22s}
+.sh-overlay.is-on{background:rgba(58,42,36,.55)}
+.sh-sheet{position:relative;width:100%;max-width:520px;max-height:90vh;overflow-y:auto;padding:10px 20px calc(24px + env(safe-area-inset-bottom));border-radius:24px 24px 0 0;background:var(--kinari);transform:translateY(100%);transition:transform .22s ease}
+.sh-overlay.is-on .sh-sheet{transform:none}
+@media (min-width:721px){.sh-overlay{align-items:center}.sh-sheet{border-radius:24px;padding-bottom:24px}}
+.sh-grip{display:block;width:40px;height:5px;margin:0 auto 10px;border-radius:3px;background:#D6C8B4}
+.sh-head{display:flex;align-items:center;justify-content:space-between}
+.sh-head h2{font-size:19px;letter-spacing:.08em}
+.sh-x{width:44px;height:44px;margin-right:-10px;border:0;border-radius:50%;background:none;color:var(--ink);display:grid;place-items:center;cursor:pointer}
+.sh-x svg{width:20px;height:20px}
+.sh-shop{display:flex;align-items:center;gap:12px;margin:10px 0 22px;padding:10px;border-radius:16px;background:#fff}
+.sh-shop img,.sh-noimg{width:56px;height:56px;flex:none;border-radius:12px;object-fit:cover;display:block}
+.sh-shop b{display:block;font-size:16px;line-height:1.5}
+.sh-shop small{font-size:13px;color:var(--sub)}
+.sh-q{margin:0 0 8px;font-size:14px;font-weight:700;color:var(--sub)}
+.sh-msgs{display:grid;gap:8px;margin-bottom:18px}
+.sh-msg{min-height:48px;padding:10px 14px 10px 40px;border:2px solid #E6DCCF;border-radius:14px;background:#fff;color:var(--ink);font-family:inherit;font-size:15px;line-height:1.6;text-align:left;cursor:pointer;position:relative}
+.sh-msg::before{content:"";position:absolute;left:14px;top:50%;width:16px;height:16px;margin-top:-8px;border-radius:50%;border:2px solid #C9B9A6;background:#fff}
+.sh-msg[aria-checked="true"]{border-color:var(--terra)}
+.sh-msg[aria-checked="true"]::before{border-color:var(--terra);background:radial-gradient(var(--terra) 0 4px,#fff 5px)}
+.sh-row{display:flex;justify-content:space-between;gap:6px}
+.sh-t{flex:1 1 0;min-width:0;display:flex;flex-direction:column;align-items:center;gap:6px;padding:4px 0;border:0;background:none;color:var(--ink);font-family:inherit;cursor:pointer}
+.sh-ic{width:56px;height:56px;border-radius:50%;display:grid;place-items:center;background:#fff;box-shadow:0 1px 3px rgba(58,42,36,.15)}
+.sh-ic svg{width:26px;height:26px}
+.sh-line .sh-ic{background:#06C755}
+.sh-line .sh-ic svg{width:32px;height:32px}
+.sh-l{font-size:12px;font-weight:700;line-height:1.4;text-align:center}
+.sh-t:focus-visible .sh-ic{outline:3px solid rgba(94,154,78,.6);outline-offset:2px}
+html.sh-open{overflow:hidden}
+.card.is-target{box-shadow:0 0 0 4px var(--orange);transition:box-shadow .4s}
+.toast{position:fixed;left:50%;bottom:24px;z-index:200;width:max-content;max-width:calc(100% - 32px);box-sizing:border-box;transform:translate(-50%,16px);padding:12px 20px;border-radius:14px;background:var(--ink);color:#fff;font-size:14px;line-height:1.7;opacity:0;pointer-events:none;transition:opacity .25s,transform .25s}
+.toast.is-on{opacity:1;transform:translate(-50%,0)}
+.sh-overlay[hidden]{display:none}

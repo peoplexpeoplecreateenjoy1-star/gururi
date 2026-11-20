@@ -243,6 +243,7 @@
     }
   }, true);
 
+  var SHARE = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M14 4l7 7-7 7v-4.2c-5.2 0-8.4 1.6-11 5.2 1-5.4 4-10.3 11-11.3V4z"/></svg>';
   var PIN = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 21s-6.5-5.6-6.5-11a6.5 6.5 0 0 1 13 0c0 5.4-6.5 11-6.5 11z"/><circle cx="12" cy="10" r="2.3"/></svg>';
 
   // いまの言語の訳があれば使い、なければ日本語
@@ -279,12 +280,14 @@
         + '<button type="button" class="ph-nav ph-next" aria-label="' + esc(T('photo.next')) + '"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M9 5l7 7-7 7"/></svg></button>'
         + '<span class="ph-dots" aria-hidden="true">' + s.photos.map(function (p, i) { return '<i' + (i === 0 ? ' class="is-on"' : '') + '></i>'; }).join('') + '</span>';
     }
-    var h = '<article class="card"><div class="card-pic' + (s.photos.length > 1 ? ' is-slider' : '') + '" style="background:' + st.bg + '">' + pic + badge + ctrl + '</div><div class="card-body">';
+    var h = '<article class="card" data-shop-i="' + shops.indexOf(s) + '"><div class="card-pic' + (s.photos.length > 1 ? ' is-slider' : '') + '" style="background:' + st.bg + '">' + pic + badge + ctrl + '</div><div class="card-body">';
     var mapUrl = /^https?:\/\//i.test(s.map) ? s.map
       : 'https://www.google.com/maps/search/?api=1&query=' + encodeURIComponent([s.name, s.sub, s.city].filter(Boolean).join(' '));
     var place = s.city
       ? '<a class="map-link" href="' + esc(mapUrl) + '" target="_blank" rel="noopener" aria-label="' + esc(T('map.aria', { name: s.name, city: W(s.city) })) + '">' + PIN + esc(W(s.city)) + '</a>'
       : '';
+    // このお店を家族や友だちに送る（2026-11-20・ラテさんの提案：「あの人と行きたいな」で誘いやすく）。カードの右上に矢印のマーク
+    h += '<button type="button" class="share-ic" data-share="' + shops.indexOf(s) + '" aria-label="' + esc(T('share.aria', { name: shownName })) + '">' + SHARE + '</button>';
     h += '<p class="meta">' + esc(kind || W(s.genre)) + (place ? '｜' + place : '') + '</p>';
     h += '<h3>' + esc(shownName) + '</h3>';
     if (nameTr && nameTr !== s.name) h += '<p class="origname" lang="ja">' + esc(s.name) + '</p>';
@@ -635,7 +638,109 @@
   if (cpBanner) cpBanner.addEventListener('click', function () { showCouponShops(true); });
   if (grid) grid.addEventListener('click', function (e) {
     var b = e.target.closest('[data-coupon]'); if (b) openCoupon(Number(b.getAttribute('data-coupon')));
+    var sb = e.target.closest('[data-share]'); if (sb) shareShop(shops[Number(sb.getAttribute('data-share'))]);
   });
+
+  /* ── お店を送る ──
+     スマホでは、LINE・メッセージ・メールなどを選べる画面（端末の共有画面）を出す。
+     その画面がない端末（パソコンなど）では、リンクをコピーして「貼り付けて送れます」と知らせる。
+     送るリンクは ?shop=店名 。開いた人には、そのお店のカードまで移動して、少しのあいだ枠を光らせる */
+  function shopLink(s) {
+    var u = location.origin + location.pathname + '?shop=' + encodeURIComponent(s.name);
+    return I18N.lang !== 'ja' ? u + '&lang=' + I18N.lang : u;
+  }
+  function track(method, s) { try { if (typeof gtag === 'function') gtag('event', 'share', { method: method, content_type: 'shop', item_id: s.name }); } catch (e) {} }
+  function toast(msg) {
+    var t = document.getElementById('gr-toast');
+    if (!t) { t = document.createElement('div'); t.id = 'gr-toast'; t.className = 'toast'; t.setAttribute('role', 'status'); document.body.appendChild(t); }
+    t.textContent = msg; t.classList.add('is-on');
+    clearTimeout(t._h); t._h = setTimeout(function () { t.classList.remove('is-on'); }, 3200);
+  }
+  /* 送り先を選ぶ画面（下から出る）。LINE をいちばん先に。端末の共有画面は「そのほか」から */
+  var shBox = null, shShop = null, shLastFocus = null;
+  var IC = {
+    line: '<svg viewBox="0 0 24 24" aria-hidden="true"><path fill="#fff" d="M12 4C7 4 3 7.3 3 11.4c0 3.6 3.2 6.7 7.6 7.3.3.1.7.2.8.5.1.2.1.6 0 .8l-.1.8c0 .2-.2.9.8.5s5.3-3.1 7.2-5.4c1.3-1.4 1.9-2.9 1.9-4.5C21 7.3 17 4 12 4z"/></svg>',
+    sms: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M21 12a8 8 0 0 1-11.6 7.1L4 20l1.1-4.6A8 8 0 1 1 21 12z"/></svg>',
+    mail: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="3" y="5" width="18" height="14" rx="2"/><path d="M3 7l9 6 9-6"/></svg>',
+    copy: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M10 14a4 4 0 0 0 5.7 0l3-3a4 4 0 0 0-5.7-5.7l-1 1"/><path d="M14 10a4 4 0 0 0-5.7 0l-3 3a4 4 0 0 0 5.7 5.7l1-1"/></svg>',
+    more: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 15V3"/><path d="M7 8l5-5 5 5"/><path d="M5 12v7a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2v-7"/></svg>'
+  };
+  function shName(s) { return String(loc(s, 'name') || s.name).replace(/\s*\n\s*/g, ' '); }
+  // 送る文は「店名｜ぐるり ひばりヶ丘」とリンクだけ（2026-11-20・G指示：決まった一言は入れず、誘う・自分用に取っておく、どちらにも使えるように）
+  function shText(s) { return T('share.title', { name: shName(s) }); }
+  function shareHtml(s) {
+    var img = s.photos && s.photos.length ? '<img src="' + esc(photoSrc(s.photos[0])) + '" alt="">' : '<span class="sh-noimg" style="background:' + (STYLE[s.genre] ? STYLE[s.genre].bg : '#EFE8E4') + '"></span>';
+    var t = function (key, ic, label, extra) { return '<button type="button" class="sh-t sh-' + key + '" data-sh="' + key + '"' + (extra || '') + '><span class="sh-ic">' + ic + '</span><span class="sh-l">' + esc(label) + '</span></button>'; };
+    return '<div class="sh-sheet" role="dialog" aria-modal="true" aria-labelledby="sh-title">' +
+      '<span class="sh-grip" aria-hidden="true"></span>' +
+      '<div class="sh-head"><h2 id="sh-title">' + esc(T('share.title2')) + '</h2>' +
+      '<button type="button" class="sh-x" data-sh-close aria-label="' + esc(T('coupon.close')) + '"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" aria-hidden="true"><path d="M6 6l12 12M18 6L6 18"/></svg></button></div>' +
+      '<div class="sh-shop">' + img + '<div><b>' + esc(shName(s)) + '</b><small>' + esc(W(s.city || '')) + '</small></div></div>' +
+      '<div class="sh-row">' +
+        t('line', IC.line, 'LINE') + t('sms', IC.sms, T('share.sms')) + t('mail', IC.mail, T('share.mail')) + t('copy', IC.copy, T('share.copy')) +
+        (navigator.share ? t('more', IC.more, T('share.more')) : '') +
+      '</div></div>';
+  }
+  function shareShop(s) {
+    if (!s) return;
+    shShop = s; shLastFocus = document.activeElement;
+    if (!shBox) {
+      shBox = document.createElement('div'); shBox.className = 'sh-overlay'; shBox.hidden = true;
+      document.body.appendChild(shBox);
+      shBox.addEventListener('click', function (e) {
+        if (e.target === shBox || e.target.closest('[data-sh-close]')) return closeShare();
+        var b = e.target.closest('[data-sh]'); if (b) sendVia(b.getAttribute('data-sh'));
+      });
+      document.addEventListener('keydown', function (e) { if (e.key === 'Escape' && shBox && !shBox.hidden) closeShare(); });
+    }
+    shBox.innerHTML = shareHtml(s);
+    shBox.hidden = false;
+    document.documentElement.classList.add('sh-open');
+    requestAnimationFrame(function () { shBox.classList.add('is-on'); });
+    var first = shBox.querySelector('.sh-line'); if (first) first.focus();
+    track('open', s);
+  }
+  function closeShare() {
+    if (!shBox || shBox.hidden) return;
+    shBox.classList.remove('is-on');
+    document.documentElement.classList.remove('sh-open');
+    setTimeout(function () { shBox.hidden = true; }, 220);
+    if (shLastFocus && shLastFocus.focus) shLastFocus.focus();
+  }
+  function sendVia(way) {
+    var s = shShop, url = shopLink(s), text = shText(s), all = text + '\n' + url;
+    if (way === 'line') { track('line', s); window.open('https://line.me/R/share?text=' + encodeURIComponent(all), '_blank', 'noopener'); return closeShare(); }
+    if (way === 'sms') { track('sms', s); location.href = 'sms:?&body=' + encodeURIComponent(all); return closeShare(); }
+    if (way === 'mail') { track('mail', s); location.href = 'mailto:?subject=' + encodeURIComponent(T('share.title', { name: shName(s) })) + '&body=' + encodeURIComponent(all); return closeShare(); }
+    if (way === 'more' && navigator.share) {
+      navigator.share({ title: text, url: url }).then(function () { track('share_sheet', s); closeShare(); }).catch(function () {});
+      return;
+    }
+    if (way === 'copy') {
+      var done = function () { track('copy', s); closeShare(); toast(T('share.copied')); };
+      if (navigator.clipboard && navigator.clipboard.writeText) navigator.clipboard.writeText(all).then(done, function () { window.prompt(T('share.copyThis'), url); });
+      else window.prompt(T('share.copyThis'), url);
+    }
+  }
+  // ?shop=店名 で開いたとき：絞り込みを外して、そのお店のカードへ
+  function openShopFromQuery() {
+    var name;
+    try { name = new URLSearchParams(location.search).get('shop'); } catch (e) { return; }
+    if (!name) return;
+    var i = shops.findIndex(function (s) { return s.name === name; });
+    try { var q = new URLSearchParams(location.search); q.delete('shop'); var rest = q.toString(); history.replaceState(null, '', location.pathname + (rest ? '?' + rest : '') + location.hash); } catch (e) {}
+    if (i < 0) return;
+    state.genre = 'all'; state.area = 'all'; state.coupon = false;
+    if (qIn && qIn.value) { qIn.value = ''; state.q = ''; if (qX) qX.hidden = true; }
+    render();
+    var el = grid.querySelector('[data-shop-i="' + i + '"]'); if (!el) return;
+    var reduce = window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+    setTimeout(function () {
+      el.scrollIntoView({ behavior: reduce ? 'auto' : 'smooth', block: 'start' });
+      el.classList.add('is-target');
+      setTimeout(function () { el.classList.remove('is-target'); }, 4000);
+    }, 300);
+  }
   window.addEventListener('popstate', function () {
     var m = location.hash.match(/^#coupon=(.+)$/);
     if (!m) return closeCoupon(true);
@@ -681,6 +786,7 @@
       render();
       startHero();
       openCouponFromHash();
+      openShopFromQuery();
       // index.html#coupons で開いたときは、クーポンありのお店を出す（チラシやInstagramからのリンク用）
       if (location.hash === '#coupons' && shops.some(function (s) { return s.coupon && shownInLang(s); })) showCouponShops(false);
     })
