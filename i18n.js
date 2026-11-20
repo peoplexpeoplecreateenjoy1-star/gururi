@@ -78,9 +78,9 @@
     'photo.prev': ['前の写真', 'Previous photo', '이전 사진', '上一張照片'],
     'photo.next': ['次の写真', 'Next photo', '다음 사진', '下一張照片'],
 
-    'ig.title': ['街のお気に入りが、もっと見つかるように。', 'So you can find more favorite spots around town.', '동네의 단골집을 더 많이 찾을 수 있도록.', '讓你在街區找到更多心頭好。'],
-    'ig.p1': ['ぐるりには、これからもすてきなお店が次々と加わっていく予定です。', 'More wonderful shops will keep joining GURURI.', '구루리에는 앞으로도 멋진 가게들이 계속 더해질 예정입니다.', 'GURURI 之後也會陸續加入更多美好的店家。'],
-    'ig.p2': ['最新のお知らせは、Instagramから受け取れます。', 'Get the latest news on Instagram.', '최신 소식은 Instagram에서 받아 보실 수 있습니다.', '最新消息請在 Instagram 上查看。'],
+    'ig.title': ['街のお気に入りが、<wbr>もっと見つかるように。', 'So you can find more favorite spots around town.', '동네의 단골집을 더 많이 찾을 수 있도록.', '讓你在街區找到更多心頭好。'],
+    'ig.p1': ['ぐるりには、<wbr>これからも<wbr>すてきなお店が<wbr>次々と<wbr>加わっていく予定です。', 'More wonderful shops will keep joining GURURI.', '구루리에는 앞으로도 멋진 가게들이 계속 더해질 예정입니다.', 'GURURI 之後也會陸續加入更多美好的店家。'],
+    'ig.p2': ['最新のお知らせは、<wbr>Instagramから<wbr>受け取れます。', 'Get the latest news on Instagram.', '최신 소식은 Instagram에서 받아 보실 수 있습니다.', '最新消息請在 Instagram 上查看。'],
     'ig.btn': ['Instagramをフォローする', 'Follow on Instagram', 'Instagram 팔로우하기', '追蹤 Instagram'],
 
     'waza.title': ['人と技に<wbr>目を向けたページ<br>わざのひと', 'WAZANOHITO: a page about people and their craft', '사람과 기술에 주목한 페이지 ‘WAZANOHITO’', '關注人與技藝的頁面「WAZANOHITO」'],

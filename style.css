@@ -382,3 +382,23 @@ html:not(.show-waza) [data-waza]{display:none !important}
 @media (max-width:720px){.nav{gap:4px 12px;justify-content:space-between}}
 @media (max-width:374px){.nav{font-size:14px;gap:4px 8px}.hd-in{padding-left:16px;padding-right:16px}}
 @media (max-width:400px){html:not([lang="ja"]) .nav{font-size:14px;gap:4px 8px}}
+/* スマホの余白を詰める（2026-11-20・G指示：スクロール中に間延びして、のっぺりした印象にならないように）
+   区切りの余白は、パソコン用の80〜96pxから、スマホでは40〜56pxに */
+@media (max-width:720px){
+  .intro{padding:36px 24px 40px;gap:20px}
+  .shops{padding-bottom:48px}
+  .band-ig{padding:40px 24px 56px}
+  .join{padding:40px 24px}
+  .c-hero-in{padding:56px 24px 16px;gap:24px}
+  .hills{height:64px}
+  .values{padding-top:44px;padding-bottom:56px}
+  .dots{margin-bottom:28px}
+  .vgrid{gap:20px}
+  .view{padding:48px 24px 56px}
+  .view-in{gap:24px}
+  .next{padding:48px 24px 48px}
+  .route{margin:24px auto 24px}
+  .team{padding-bottom:48px}
+  .cta{padding-bottom:40px}
+}
+html[lang="ja"] .band-ig h2,html[lang="ja"] .band-ig p{word-break:keep-all;overflow-wrap:anywhere}
