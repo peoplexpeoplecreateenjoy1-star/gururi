@@ -79,7 +79,7 @@
     'ig.p2': ['最新のお知らせは、Instagramから受け取れます。', 'Get the latest news on Instagram.', '최신 소식은 Instagram에서 받아 보실 수 있습니다.', '最新消息請在 Instagram 上查看。'],
     'ig.btn': ['Instagramをフォローする', 'Follow on Instagram', 'Instagram 팔로우하기', '追蹤 Instagram'],
 
-    'waza.title': ['人と技に<wbr>目を向けたページ<wbr>「わざのひと」', 'WAZANOHITO: a page about people and their craft', '사람과 기술에 주목한 페이지 ‘WAZANOHITO’', '關注人與技藝的頁面「WAZANOHITO」'],
+    'waza.title': ['人と技に<wbr>目を向けたページ<br>わざのひと', 'WAZANOHITO: a page about people and their craft', '사람과 기술에 주목한 페이지 ‘WAZANOHITO’', '關注人與技藝的頁面「WAZANOHITO」'],
     'waza.p': ['ぐるりは、<wbr>人と地域に<wbr>目を向けたページです。<wbr>人と技に<wbr><span class="nw">目を向けたページが、</span><wbr><span class="nw">「わざのひと」です。</span><wbr>ひとつの技に<wbr>向き合っている<wbr>方たちを、<wbr>その技とともに<wbr>紹介しています。', 'GURURI looks at people and their neighborhood. WAZANOHITO looks at people and their craft, introducing people devoted to a single craft, together with that craft.', '구루리는 사람과 지역에 주목한 페이지입니다. 사람과 기술에 주목한 페이지가 ‘WAZANOHITO’입니다. 하나의 기술과 마주하고 있는 분들을 그 기술과 함께 소개합니다.', 'GURURI 是關注人與地方的頁面。關注人與技藝的頁面則是「WAZANOHITO」，介紹專注於一項技藝的人們，以及他們的技藝。'],
     'waza.btn': ['わざのひとを見る', 'See WAZANOHITO', 'WAZANOHITO 보기', '查看 WAZANOHITO'],
     'join.title': ['<span class="nw">ぐるり ひばりヶ丘への</span><span class="nw">掲載をご希望の</span><span class="nw">お店の方へ</span>', 'For shops interested in being featured on GURURI Hibarigaoka', '구루리 히바리가오카 게재를 희망하시는 가게 분들께', '想刊登於 GURURI Hibarigaoka 的店家'],
@@ -94,7 +94,7 @@
     'v2.h': ['毎月、すこしずつ新しく', 'A little new, every month', '매달 조금씩 새롭게', '每個月，一點一點更新'],
     'v2.p': ['お店の情報は<wbr>毎月更新し、<wbr>あたらしく<wbr>加わったお店も<wbr>ご紹介しています。', 'Shop information is updated every month, and we introduce newly joined shops too.', '가게 정보는 매달 업데이트하며, 새로 합류한 가게도 소개합니다.', '店家資訊每月更新，也會介紹新加入的店家。'],
     'v3.h': ['垣根をこえて、となりに', 'Side by side, across boundaries', '경계를 넘어, 나란히', '跨越界線，比鄰而居'],
-    'v3.p': ['カフェのとなりに、<wbr>かばん屋さん。<br>花屋さんのとなりに、<wbr>フォトスタジオ。<br>業種や市の<wbr>境目にとらわれず、<br>近くの気になるお店を<br>並べています。', 'A bag shop next to a café. A photo studio next to a flower shop. We place interesting nearby shops side by side, regardless of business type or city lines.', '카페 옆에 가방 가게, 꽃집 옆에 사진관. 업종이나 시의 경계에 얽매이지 않고, 가까이 있는 마음 가는 가게들을 나란히 소개합니다.', '咖啡館旁邊是包包店，花店旁邊是照相館。不拘業種或市界，把附近令人好奇的店家並排介紹。'],
+    'v3.p': ['カフェのとなりに、<wbr>かばん屋さん。<br>花屋さんのとなりに、<wbr>フォトスタジオ。<br>業種や市の<wbr>境目にとらわれず、<br>近くの気になるお店を<wbr>並べています。', 'A bag shop next to a café. A photo studio next to a flower shop. We place interesting nearby shops side by side, regardless of business type or city lines.', '카페 옆에 가방 가게, 꽃집 옆에 사진관. 업종이나 시의 경계에 얽매이지 않고, 가까이 있는 마음 가는 가게들을 나란히 소개합니다.', '咖啡館旁邊是包包店，花店旁邊是照相館。不拘業種或市界，把附近令人好奇的店家並排介紹。'],
     'view.h': ['目指している景色', 'The scene we hope for', '우리가 그리는 풍경', '我們嚮往的風景'],
     'view.p1': ['訪れた方が、<wbr>心から楽しんでくださること。', 'That everyone who visits truly enjoys their time.', '찾아오신 분들이 진심으로 즐거워하시는 것.', '讓來訪的人打從心底感到愉快。'],
     'view.p2': ['その時間が、<wbr>お店の力になり、', 'That this time becomes a source of strength for the shops,', '그 시간이 가게의 힘이 되고,', '讓這段時光成為店家的力量，'],

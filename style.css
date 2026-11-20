@@ -345,7 +345,8 @@ body{font-weight:500}
 .links a{font-size:15px}
 .pp-doc{font-size:16px}
 @media (max-width:720px){
-  .vcard-body{padding:28px 22px 30px}
+  .values{padding-left:16px;padding-right:16px}
+  .vcard-body{padding:28px 18px 30px}   /* 「近くの気になるお店を並べています。」を1行に収める */
   .tcard{padding:28px 20px}
   .pp-doc{font-size:16px}
 }
