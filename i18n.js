@@ -311,6 +311,10 @@ document.addEventListener('click', function (e) {
   e.preventDefault();
   var still = window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches;
   window.scrollTo({ top: 0, behavior: still ? 'auto' : 'smooth' });
-  var first = document.querySelector('header a, header button');
-  if (first) first.focus({ preventScroll: true });
+  // キーボードで押したときだけ、ページの先頭（ロゴ）に操作の位置を移す。
+  // 指やマウスで押したときは移さない（移すと、iPhone でロゴに緑の枠が出てしまうため。2026-11-21）
+  if (e.detail === 0) {
+    var first = document.querySelector('header a, header button');
+    if (first) first.focus({ preventScroll: true });
+  }
 });

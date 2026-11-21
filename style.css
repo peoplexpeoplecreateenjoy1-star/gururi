@@ -546,3 +546,6 @@ html[lang="ja"] .jn h1,html[lang="ja"] .jn h2,html[lang="ja"] .jn h3,html[lang="
   .jc-close,.jb-lead{font-size:16px;text-align:left}
   .js-grid b{font-size:28px}
 }
+
+/* 指やマウスで押したときは、ロゴに枠を出さない（キーボードで移ったときだけ出す） */
+.brand:focus:not(:focus-visible),.ft-brand:focus:not(:focus-visible){outline:none}
