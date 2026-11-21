@@ -1,0 +1,4 @@
+User-agent: *
+Allow: /
+
+Sitemap: https://gururi.torimich.com/sitemap.xml
