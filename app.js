@@ -451,7 +451,7 @@
     try { grid.focus({ preventScroll: true }); } catch (e) {}
   }
 
-  var BATCH = 12, batches = 1, batchKey = '', shownCount = 0;
+  var BATCH = 12, FIRST_BATCHES = 2, STEP_BATCHES = 2, batches = FIRST_BATCHES, batchKey = '', shownCount = 0; // 最初も「もっと見る」も2まとまり（24枚）ずつ
   // 12枚のまとまりごとに、協賛カードを1枚（6軒目のあと）。協賛があるまとまりは、お店11軒＋協賛1枚
   function layoutTiles(list, nb) {
     var order = spListB(), out = [], idx = 0, pos = 0;
@@ -478,8 +478,8 @@
   var moreBtn = document.getElementById('shop-more');
   if (moreBtn) moreBtn.addEventListener('click', function () {
     var before = shownCount;
-    batches++; render();
-    try { if (typeof gtag === 'function') gtag('event', 'more_click', { batch: batches }); } catch (e) {}
+    batches += STEP_BATCHES; render();
+    try { if (typeof gtag === 'function') gtag('event', 'more_click', { batch: batches / STEP_BATCHES }); } catch (e) {}
     // 足したカードの先頭へ、操作の位置を移す（キーボードや読み上げで続きから読めるように）
     var first = grid.querySelectorAll('[data-shop-i]')[before];
     if (first) { first.setAttribute('tabindex', '-1'); first.focus({ preventScroll: true }); }
@@ -510,9 +510,9 @@
         (!state.coupon || s.coupon) && matchQ(s, ws);
     });
     list = orderShops(list);
-    // 「もっと見る」：12枚ずつ。絞り込み・検索・言語が変わったら、最初の12枚に戻す
+    // 「もっと見る」：24枚ずつ。絞り込み・検索・言語が変わったら、最初の24枚に戻す
     var key = [I18N.lang, state.genre, state.area, state.coupon, state.q].join('|');
-    if (key !== batchKey) { batchKey = key; batches = 1; }
+    if (key !== batchKey) { batchKey = key; batches = FIRST_BATCHES; }
     var tiles = layoutTiles(list, batches);
     grid.innerHTML = tiles.html;
     shownCount = tiles.shown;
