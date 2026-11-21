@@ -549,3 +549,44 @@ html[lang="ja"] .jn h1,html[lang="ja"] .jn h2,html[lang="ja"] .jn h3,html[lang="
 
 /* 指やマウスで押したときは、ロゴに枠を出さない（キーボードで移ったときだけ出す） */
 .brand:focus:not(:focus-visible),.ft-brand:focus:not(:focus-visible){outline:none}
+
+/* ───── 協賛（2026-11-21） ───── */
+.sp-pr{display:inline-flex;align-items:center;padding:2px 10px;border-radius:999px;background:#EFE6DA;color:#6B5A50;font-size:12px;font-weight:700;letter-spacing:.08em;line-height:1.8;white-space:nowrap}
+.sp-mark{width:56px;height:56px;flex:none;border-radius:16px;display:grid;place-items:center;background:var(--kinari);border:2px solid #E6DCCF;color:var(--terra-dk);font-family:var(--maru);font-weight:900;font-size:24px;overflow:hidden}
+.sp-mark.has-logo{background:#fff}
+.sp-mark img,.spb-mark img{width:100%;height:100%;object-fit:contain;padding:6px}
+.sp-link{display:inline-flex;align-items:center;gap:4px;margin-top:6px;font-size:14px;font-weight:700;color:var(--terra-dk);text-decoration:underline;text-underline-offset:4px}
+.sp-link svg,.spb-btn svg{width:16px;height:16px}
+/* 案A */
+.spa{background:#EFE9E1;padding:56px 24px 64px}
+.spa[hidden]{display:none}
+.spa-in{max-width:1000px;margin:0 auto}
+.spa-hd{text-align:center;margin-bottom:24px}
+.spa-hd h2{font-size:22px;line-height:1.6;letter-spacing:.08em;margin-top:10px}
+.spa-hd p{font-size:15px;line-height:1.9;color:var(--sub);margin-top:4px}
+.spa-grid{list-style:none;margin:0;padding:0;display:grid;grid-template-columns:repeat(auto-fill,minmax(280px,1fr));gap:16px}
+.spa-c{display:flex;gap:14px;align-items:flex-start;padding:18px;border-radius:18px;background:#fff}
+.spa-tx{min-width:0}
+.spa-c h3{font-size:17px;line-height:1.5;letter-spacing:.04em}
+.spa-msg{font-size:15px;line-height:1.85;color:var(--sub);margin-top:2px;display:-webkit-box;-webkit-line-clamp:3;-webkit-box-orient:vertical;overflow:hidden}
+/* 案B */
+.spb{align-self:start;background:#fff;border-radius:20px;overflow:hidden;display:flex;flex-direction:column;border:2px solid #E6DCCF}
+.spb-pic{position:relative;aspect-ratio:4/3;display:grid;place-items:center;background:var(--kinari)}
+.spb-pic .sp-pr{position:absolute;top:12px;left:12px;background:rgba(255,255,255,.95)}
+.spb-mark{width:96px;height:96px;border-radius:28px;display:grid;place-items:center;background:#fff;border:2px solid #E6DCCF;color:var(--terra-dk);font-family:var(--maru);font-weight:900;font-size:40px;overflow:hidden}
+.spb-body{padding:20px 22px 22px;display:flex;flex-direction:column;gap:8px;flex-grow:1}
+.spb-kick{font-size:13px;font-weight:700;color:var(--sub);letter-spacing:.06em}
+.spb h3{font-size:20px;line-height:1.45;letter-spacing:.06em}
+.spb-msg{font-size:16px;line-height:1.9;display:-webkit-box;-webkit-line-clamp:4;-webkit-box-orient:vertical;overflow:hidden}
+.spb-btn{margin-top:6px;display:flex;align-items:center;justify-content:center;gap:6px;min-height:48px;border-radius:999px;border:2px solid var(--line);font-weight:700;font-size:15px;color:var(--ink);text-decoration:none}
+.spb-btn:hover{background:var(--kinari)}
+html[lang="ja"] .spa-hd h2,html[lang="ja"] .spa-hd p{word-break:keep-all;overflow-wrap:anywhere}
+@media (max-width:720px){.spa{padding:40px 20px 48px}.spa-grid{grid-template-columns:1fr;gap:12px}}
+
+/* もっと見る（2026-11-21） */
+.more-wrap{display:flex;justify-content:center;margin-top:32px}
+.more-btn{display:inline-flex;align-items:center;gap:8px;min-height:52px;padding:0 32px;border:2px solid var(--terra);border-radius:999px;background:#fff;color:var(--terra-dk);font-family:inherit;font-size:16px;font-weight:700;letter-spacing:.06em;cursor:pointer}
+.more-btn svg{width:20px;height:20px}
+.more-btn:hover{background:var(--kinari)}
+.more-btn[hidden]{display:none}
+.more-btn:focus-visible{outline:3px solid rgba(94,154,78,.5);outline-offset:2px}

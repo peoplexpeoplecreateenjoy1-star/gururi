@@ -72,6 +72,12 @@
     'jn.cta.h': ["<span class=\"nw\">ぐるり ひばりヶ丘で、</span><wbr>地域の方との<wbr>新しい出会いを<wbr>広げてみませんか。", "Why not open new connections with your neighbors through GURURI Hibarigaoka?", "구루리 히바리가오카에서 지역 분들과의 새로운 만남을 넓혀 보지 않으시겠어요?", "要不要透過 GURURI Hibarigaoka，拓展與在地居民的新相遇？"],
     'jn.cta.btn': ["掲載を申し込む（無料）", "Apply to be listed (free)", "게재 신청하기 (무료)", "申請刊登（免費）"],
     'jn.cta.note': ["申し込みフォームでは<wbr>写真もお送りいただくため、<wbr>Googleアカウントでの<wbr>ログインを<wbr>お願いしています。", "The form asks for photos, so you’ll be asked to sign in with a Google account.", "신청 양식에서 사진도 보내 주셔야 해서 Google 계정 로그인이 필요합니다.", "申請表單需要上傳照片，因此需要登入 Google 帳戶。"],
+    'sp.label': ["PR・協賛", "PR · Sponsor", "PR · 협찬", "PR・贊助"],
+    'sp.a.h': ["ぐるりを応援して<wbr>くれている会社", "Companies supporting GURURI", "구루리를 응원해 주시는 회사", "支持 GURURI 的企業"],
+    'sp.a.p': ["地域のお店と暮らしを、<wbr>一緒に応援して<wbr>くださっています。", "They support local shops and everyday life in the area, together with us.", "지역 가게와 생활을 함께 응원해 주고 있습니다.", "與我們一起支持在地的店家與生活。"],
+    'sp.b.kick': ["ぐるりを応援しています", "Supporting GURURI", "구루리를 응원합니다", "支持 GURURI"],
+    'sp.link': ["ウェブサイトを見る", "Visit website", "웹사이트 보기", "查看網站"],
+    'more.btn': ["もっと見る（あと{n}軒）", "Show more ({n} left)", "더 보기 (남은 가게 {n}곳)", "顯示更多（還有{n}家）"],
     'title.concept': ['ぐるりについて｜ぐるり ひばりヶ丘', 'About GURURI | GURURI Hibarigaoka', '구루리 소개 | GURURI Hibarigaoka', '關於 GURURI｜GURURI Hibarigaoka'],
     'brand': ['ぐるり ひばりヶ丘', 'GURURI Hibarigaoka', 'GURURI Hibarigaoka', 'GURURI Hibarigaoka'],
     // ロゴの右に並べる地域名（ロゴの高さの約40%・文字の底をロゴにそろえる。2026-11-15・G決定）

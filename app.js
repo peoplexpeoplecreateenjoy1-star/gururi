@@ -24,6 +24,95 @@
     });
   });
 
+
+  /* ───── 協賛（2026-11-21） ─────
+     config.js の sponsors に1社1行。slot "A"＝ページ下の「ぐるりを応援してくれている会社」（何社でも）、
+     slot "B"＝お店一覧の中の協賛カード（同時に1社。2社以上なら月替わり）。
+     開始日より前・終了日のあとは出さない。0社なら枠ごと出さない。
+     編集の独立：協賛していても、掲載店の並び順・紹介・表示は変えない。お店のカードに広告の印は付けない。
+     計測：sponsor_view（枠が画面の半分以上に入ったとき、1回の表示につき1回）／sponsor_click。パラメータ sponsor_name・slot */
+  var SP_MAX = { A: 40, B: 80 };   // ひとことの文字数の目安（超えた分は、Aは3行・Bは4行で「…」に）
+  function spEsc(s) { return String(s == null ? '' : s).replace(/[&<>"']/g, function (c) { return { '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]; }); }
+  function spToday() { var d = new Date(); return d.getFullYear() + '-' + ('0' + (d.getMonth() + 1)).slice(-2) + '-' + ('0' + d.getDate()).slice(-2); }
+  function spActive(slot) {
+    var today = spToday();
+    return (Array.isArray(CFG.sponsors) ? CFG.sponsors : []).filter(function (s) {
+      if (!s || !s.name || String(s.slot || 'A').toUpperCase() !== slot) return false;
+      if (s.start && today < String(s.start)) return false;
+      if (s.end && today > String(s.end)) return false;
+      return true;
+    });
+  }
+  function spText(s, slot) {
+    var t = s.text;
+    if (t && typeof t === 'object') t = t[I18N.lang] || t.ja || '';   // 訳がなければ、どの言語の画面でも日本語
+    t = String(t || '');
+    if (t.length > SP_MAX[slot] && window.console) console.warn('協賛のひとことが長めです（' + s.name + '：' + t.length + '文字。目安は' + SP_MAX[slot] + '文字）');
+    return t;
+  }
+  function spMark(s, cls) {
+    if (s.logo) return '<span class="' + cls + ' has-logo"><img src="' + spEsc(s.logo) + '" alt="" loading="lazy"></span>';
+    var n = String(s.name).replace(/^(株式会社|有限会社|合同会社|一般社団法人|医療法人(社団|財団)?|社会福祉法人)\s*|[（(][株有][）)]\s*/g, '').replace(/^[〇○◯\s]+/, '');
+    return '<span class="' + cls + '" aria-hidden="true">' + spEsc(n.charAt(0)) + '</span>';
+  }
+  function spLink(s, slot, label, cls, pos) {
+    return '<a class="' + cls + '" href="' + spEsc(s.url) + '" target="_blank" rel="noopener sponsored" data-sp="' + spEsc(s.name) + '" data-slot="' + slot + '"' + (pos ? ' data-pos="' + pos + '"' : '') + '>' + spEsc(label) +
+      '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M7 17L17 7M9 7h8v8"/></svg></a>';
+  }
+  var spSeen = {}, spIO = null;
+  function spGa(ev, el) {
+    var p = { sponsor_name: el.getAttribute('data-sp'), slot: el.getAttribute('data-slot') };
+    if (el.getAttribute('data-pos')) p.position = Number(el.getAttribute('data-pos'));   // 案Bの何番目の枠か（1＝最初の12枚の中）
+    try { if (typeof gtag === 'function') gtag('event', ev, p); } catch (e) {}
+  }
+  function spWatch(root) {
+    root.querySelectorAll('[data-sp-box]').forEach(function (el) {
+      if (!('IntersectionObserver' in window)) return;
+      if (!spIO) spIO = new IntersectionObserver(function (es) {
+        es.forEach(function (x) {
+          if (!x.isIntersecting) return;
+          var k = x.target.getAttribute('data-slot') + '|' + x.target.getAttribute('data-sp') + '|' + (x.target.getAttribute('data-pos') || '');
+          spIO.unobserve(x.target);
+          if (spSeen[k]) return; spSeen[k] = true; spGa('sponsor_view', x.target);
+        });
+      }, { threshold: 0.5 });
+      spIO.observe(el);
+    });
+  }
+  document.addEventListener('click', function (e) { var a = e.target.closest && e.target.closest('a[data-sp]'); if (a) spGa('sponsor_click', a); });
+  var spOrderA = null;
+  // 案A：ぐるりを応援してくれている会社
+  function spRenderA() {
+    var box = document.getElementById('sp-a'); if (!box) return;
+    if (!spOrderA) spOrderA = spShuffle(spActive('A'));   // 並びは訪問ごとにランダム（左上ばかり目立たないように）
+    var list = spOrderA;
+    box.hidden = !list.length;
+    if (!list.length) { box.innerHTML = ''; return; }
+    box.innerHTML = '<div class="spa-in"><div class="spa-hd"><span class="sp-pr">' + spEsc(T('sp.label')) + '</span>' +
+      '<h2 id="sp-a-title">' + T('sp.a.h') + '</h2><p>' + T('sp.a.p') + '</p></div><ul class="spa-grid">' +
+      list.map(function (s) {
+        return '<li class="spa-c" data-sp-box data-sp="' + spEsc(s.name) + '" data-slot="A">' + spMark(s, 'sp-mark') +
+          '<div class="spa-tx"><h3>' + spEsc(s.name) + '</h3>' + (spText(s, 'A') ? '<p class="spa-msg">' + spEsc(spText(s, 'A')) + '</p>' : '') +
+          (s.url ? spLink(s, 'A', T('sp.link'), 'sp-link') : '') + '</div></li>';
+      }).join('') + '</ul></div>';
+    spWatch(box);
+  }
+  // 案B：一覧の中の協賛カード（2026-11-21 改：12枚ずつのまとまりごとに1枠。「もっと見る」で枠も増える）
+  // 1回の訪問（ページを開くたび）に、協賛者の並びをランダムに入れ替え、上の枠から順に1社ずつ入れる。
+  // 同じ訪問の中で同じ協賛者は2回出ない。協賛者が枠より少ないときは、残りの枠はお店のカードになる。
+  var spOrderB = null;
+  function spShuffle(arr) { arr = arr.slice(); for (var i = arr.length - 1; i > 0; i--) { var j = Math.floor(Math.random() * (i + 1)); var t = arr[i]; arr[i] = arr[j]; arr[j] = t; } return arr; }
+  function spListB() { if (!spOrderB) spOrderB = spShuffle(spActive('B')); return spOrderB; }
+  function spCardB(s, pos) {
+    return '<article class="spb" data-sp-box data-sp="' + spEsc(s.name) + '" data-slot="B" data-pos="' + pos + '" aria-label="' + spEsc(T('sp.label')) + '">' +
+      '<div class="spb-pic">' + spMark(s, 'spb-mark') + '<span class="sp-pr">' + spEsc(T('sp.label')) + '</span></div>' +
+      '<div class="spb-body"><p class="spb-kick">' + T('sp.b.kick') + '</p><h3>' + spEsc(s.name) + '</h3>' +
+      (spText(s, 'B') ? '<p class="spb-msg">' + spEsc(spText(s, 'B')) + '</p>' : '') +
+      (s.url ? spLink(s, 'B', T('sp.link'), 'spb-btn', pos) : '') + '</div></article>';
+  }
+  spRenderA();
+  document.addEventListener('gururi:lang', spRenderA);
+
   var grid = document.getElementById('shop-grid');
   if (!grid) return;
 
@@ -362,6 +451,45 @@
     try { grid.focus({ preventScroll: true }); } catch (e) {}
   }
 
+  var BATCH = 12, batches = 1, batchKey = '', shownCount = 0;
+  // 12枚のまとまりごとに、協賛カードを1枚（6軒目のあと）。協賛があるまとまりは、お店11軒＋協賛1枚
+  function layoutTiles(list, nb) {
+    var order = spListB(), out = [], idx = 0, pos = 0;
+    for (var b = 0; b < nb && idx < list.length; b++) {
+      var sp = order[b] || null;
+      var take = sp ? BATCH - 1 : BATCH;
+      var part = list.slice(idx, idx + take);
+      var at = -1;
+      if (sp && part.length >= 6) {
+        at = 6;
+        // 協賛者が掲載店でもあるときは、そのお店のカードと隣り合わないようにずらす
+        var own = sp.shop ? part.findIndex(function (x) { return x.name === sp.shop; }) : -1;
+        if (own >= 0 && (own === 5 || own === 6)) at = part.length >= 10 ? 9 : 3;
+      } else if (sp) { take = BATCH; part = list.slice(idx, idx + take); }
+      part.forEach(function (s, k) {
+        if (k === at) { pos++; out.push(spCardB(sp, pos)); }
+        out.push(card(s));
+      });
+      if (at === part.length) { pos++; out.push(spCardB(sp, pos)); }
+      idx += part.length;
+    }
+    return { html: out.join(''), shown: idx };
+  }
+  var moreBtn = document.getElementById('shop-more');
+  if (moreBtn) moreBtn.addEventListener('click', function () {
+    var before = shownCount;
+    batches++; render();
+    try { if (typeof gtag === 'function') gtag('event', 'more_click', { batch: batches }); } catch (e) {}
+    // 足したカードの先頭へ、操作の位置を移す（キーボードや読み上げで続きから読めるように）
+    var first = grid.querySelectorAll('[data-shop-i]')[before];
+    if (first) { first.setAttribute('tabindex', '-1'); first.focus({ preventScroll: true }); }
+  });
+  // あるお店のカードを、一覧に出す（まだ「もっと見る」の先にあるときは、そこまで広げる）
+  function revealShop(i) {
+    var el = grid.querySelector('[data-shop-i="' + i + '"]');
+    while (!el && shownCount < shops.length && batches < 50) { batches++; render(); el = grid.querySelector('[data-shop-i="' + i + '"]'); }
+    return el;
+  }
   function render() {
     var vis = shops.filter(shownInLang);
     var cities = [];
@@ -382,8 +510,19 @@
         (!state.coupon || s.coupon) && matchQ(s, ws);
     });
     list = orderShops(list);
-    grid.innerHTML = list.map(card).join('');
+    // 「もっと見る」：12枚ずつ。絞り込み・検索・言語が変わったら、最初の12枚に戻す
+    var key = [I18N.lang, state.genre, state.area, state.coupon, state.q].join('|');
+    if (key !== batchKey) { batchKey = key; batches = 1; }
+    var tiles = layoutTiles(list, batches);
+    grid.innerHTML = tiles.html;
+    shownCount = tiles.shown;
+    spWatch(grid);
     setupSliders();
+    var more = document.getElementById('shop-more');
+    if (more) {
+      more.hidden = tiles.shown >= list.length;
+      more.querySelector('span').textContent = T('more.btn', { n: list.length - tiles.shown });
+    }
     document.getElementById('shop-count').textContent = T('shops.count', { n: list.length, t: vis.length });
     var note = document.getElementById('mt-note');
     if (note) note.hidden = I18N.lang === 'ja';
@@ -746,7 +885,7 @@
     state.genre = 'all'; state.area = 'all'; state.coupon = false;
     if (qIn && qIn.value) { qIn.value = ''; state.q = ''; if (qX) qX.hidden = true; }
     render();
-    var el = grid.querySelector('[data-shop-i="' + i + '"]'); if (!el) return;
+    var el = revealShop(i); if (!el) return;
     var reduce = window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches;
     setTimeout(function () {
       el.scrollIntoView({ behavior: reduce ? 'auto' : 'smooth', block: 'start' });
