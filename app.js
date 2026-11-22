@@ -25,26 +25,72 @@
   });
 
 
-  /* ───── 協賛（2026-11-21） ─────
-     config.js の sponsors に1社1行。slot "A"＝ページ下の「ぐるりを応援してくれている会社」（何社でも）、
-     slot "B"＝お店一覧の中の協賛カード（同時に1社。2社以上なら月替わり）。
+  /* ───── 協賛（2026-11-21、2026-11-22 改：プラン・業種・上限・計測の印） ─────
+     config.js の sponsors に1社1行。
+       plan "support"＝応援（ページ下の「ぐるりを応援してくれている会社」の欄だけ）
+       plan "card"   ＝応援＋協賛カード（応援の欄にも自動で載り、お店一覧の中の協賛カードにも出る）
+       （古い書き方の slot "A" は support、slot "B" は card として扱う）
+     協賛カードは、同時に CFG.sponsorCardMax 社まで（今は2社）・同じ業種（category）は1社まで。
+       超えたときは config.js の上に書いてある会社から順に出し、残りはカードに出さない（応援の欄には出る）。
+       気づけるように、ブラウザの開発者向けの表示に注意を出し、URLの末尾に ?check=sponsors を付けて開くと、画面の上にも出す。
+     リンクには、ぐるりから来たことが分かる印（utm_source=gururi&utm_medium=sponsor、欄かカードかを utm_content）を自動で付ける。
      開始日より前・終了日のあとは出さない。0社なら枠ごと出さない。
      編集の独立：協賛していても、掲載店の並び順・紹介・表示は変えない。お店のカードに広告の印は付けない。
-     計測：sponsor_view（枠が画面の半分以上に入ったとき、1回の表示につき1回）／sponsor_click。パラメータ sponsor_name・slot */
+     計測：sponsor_view（枠が画面の半分以上に入ったとき、1回の表示につき1回）／sponsor_click。パラメータ sponsor_name・slot（A／B）・position（カードの何番目の枠か） */
   var SP_MAX = { A: 40, B: 80 };   // ひとことの文字数の目安（超えた分は、Aは3行・Bは4行で「…」に）
+  var SP_CARD_MAX = Number(CFG.sponsorCardMax) > 0 ? Number(CFG.sponsorCardMax) : 2;
+  var spIssues = [];
   function spEsc(s) { return String(s == null ? '' : s).replace(/[&<>"']/g, function (c) { return { '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]; }); }
   function spToday() { var d = new Date(); return d.getFullYear() + '-' + ('0' + (d.getMonth() + 1)).slice(-2) + '-' + ('0' + d.getDate()).slice(-2); }
-  function spActive(slot) {
+  function spPlan(s) {
+    var p = String(s.plan || '').toLowerCase();
+    if (p === 'card' || p === 'support') return p;
+    return String(s.slot || 'A').toUpperCase() === 'B' ? 'card' : 'support';
+  }
+  // 期間内の協賛者（config.js に書いた順）
+  var spAll = (Array.isArray(CFG.sponsors) ? CFG.sponsors : []).filter(function (s) {
     var today = spToday();
-    return (Array.isArray(CFG.sponsors) ? CFG.sponsors : []).filter(function (s) {
-      if (!s || !s.name || String(s.slot || 'A').toUpperCase() !== slot) return false;
-      if (s.start && today < String(s.start)) return false;
-      if (s.end && today > String(s.end)) return false;
-      return true;
+    if (!s || !s.name) return false;
+    if (s.start && today < String(s.start)) return false;
+    if (s.end && today > String(s.end)) return false;
+    return true;
+  });
+  // 協賛カードに出す会社：上限と、同じ業種は1社まで
+  var spCards = (function () {
+    var out = [], cats = {};
+    spAll.filter(function (s) { return spPlan(s) === 'card'; }).forEach(function (s) {
+      var cat = String(s.category || '').trim();
+      if (!cat) spIssues.push('「' + s.name + '」の業種（category）が空です。同じ業種の確認ができません。');
+      if (cat && cats[cat]) { spIssues.push('協賛カードで同じ業種「' + cat + '」が重なっています：「' + cats[cat] + '」と「' + s.name + '」。カードには「' + cats[cat] + '」だけを出し、「' + s.name + '」は応援の欄だけに出しています。'); return; }
+      if (out.length >= SP_CARD_MAX) { spIssues.push('協賛カードの上限（' + SP_CARD_MAX + '社）を超えています。「' + s.name + '」はカードに出さず、応援の欄だけに出しています。'); return; }
+      if (cat) cats[cat] = s.name;
+      out.push(s);
     });
+    return out;
+  })();
+  if (spIssues.length) {
+    if (window.console) spIssues.forEach(function (m) { console.warn('【ぐるり協賛】' + m); });
+    if (/[?&]check=sponsors\b/.test(location.search)) (function (fn) { if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', fn); else fn(); })(function () {
+      var bar = document.createElement('div');
+      bar.setAttribute('role', 'alert');
+      bar.style.cssText = 'position:sticky;top:0;z-index:999;background:#FFF3CD;color:#5A4300;border-bottom:2px solid #E0B200;padding:12px 16px;font-size:14px;line-height:1.7';
+      bar.innerHTML = '<b>協賛の設定の確認</b><br>' + spIssues.map(spEsc).join('<br>');
+      document.body.insertBefore(bar, document.body.firstChild);
+    });
+  } else if (/[?&]check=sponsors\b/.test(location.search) && window.console) {
+    console.info('【ぐるり協賛】設定に問題はありません（応援の欄 ' + spAll.length + '社・協賛カード ' + spCards.length + '社）');
+  }
+  function spActive(slot) { return slot === 'B' ? spCards.slice() : spAll.slice(); }
+  // リンクに、ぐるりから来たことが分かる印を付ける（すでに utm_source があるときは、そのまま）
+  function spUrl(url, slot) {
+    url = String(url || '');
+    if (!/^https?:\/\//i.test(url) || /[?&]utm_source=/i.test(url)) return url;
+    var hash = '', i = url.indexOf('#');
+    if (i >= 0) { hash = url.slice(i); url = url.slice(0, i); }
+    return url + (url.indexOf('?') >= 0 ? '&' : '?') + 'utm_source=gururi&utm_medium=sponsor&utm_content=' + (slot === 'B' ? 'card' : 'support') + hash;
   }
   function spText(s, slot) {
-    var t = s.text;
+    var t = slot === 'B' && s.cardText ? s.cardText : s.text;   // カードのひとことは cardText（なければ応援の欄と同じ text）
     if (t && typeof t === 'object') t = t[I18N.lang] || t.ja || '';   // 訳がなければ、どの言語の画面でも日本語
     t = String(t || '');
     if (t.length > SP_MAX[slot] && window.console) console.warn('協賛のひとことが長めです（' + s.name + '：' + t.length + '文字。目安は' + SP_MAX[slot] + '文字）');
@@ -56,7 +102,7 @@
     return '<span class="' + cls + '" aria-hidden="true">' + spEsc(n.charAt(0)) + '</span>';
   }
   function spLink(s, slot, label, cls, pos) {
-    return '<a class="' + cls + '" href="' + spEsc(s.url) + '" target="_blank" rel="noopener sponsored" data-sp="' + spEsc(s.name) + '" data-slot="' + slot + '"' + (pos ? ' data-pos="' + pos + '"' : '') + '>' + spEsc(label) +
+    return '<a class="' + cls + '" href="' + spEsc(spUrl(s.url, slot)) + '" target="_blank" rel="noopener sponsored" data-sp="' + spEsc(s.name) + '" data-slot="' + slot + '"' + (pos ? ' data-pos="' + pos + '"' : '') + '>' + spEsc(label) +
       '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M7 17L17 7M9 7h8v8"/></svg></a>';
   }
   var spSeen = {}, spIO = null;
