@@ -12,6 +12,8 @@ window.GURURI_CONFIG = {
   instagram: "https://ykt5da.s.gy/insta-gururi",
   wazanohito: "https://ykt5da.s.gy/wazanohito-explore",
   joinForm: "https://ykt5da.s.gy/google-form-access",
+  // 「掲載について」ページの「協賛について問い合わせる」のリンク先（2026-11-22・G指定：TORIMICHのお問い合わせ）
+  sponsorContact: "https://ykt5da.s.gy/ask-torimich",
   torimichHome: "https://ykt5da.s.gy/torimich-explore",
   latteInstagram: "https://ykt5da.s.gy/seibu-cafe",
 

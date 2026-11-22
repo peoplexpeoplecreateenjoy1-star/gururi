@@ -590,3 +590,26 @@ html[lang="ja"] .spa-hd h2,html[lang="ja"] .spa-hd p{word-break:keep-all;overflo
 .more-btn:hover{background:var(--kinari)}
 .more-btn[hidden]{display:none}
 .more-btn:focus-visible{outline:3px solid rgba(94,154,78,.5);outline-offset:2px}
+
+/* 掲載の目安と協賛のご案内（join.html・2026-11-22） */
+.jg-lead{max-width:720px;margin:0 auto 30px;text-align:center;font-size:17px;line-height:2;color:var(--ink)}
+.jg-list{list-style:none;margin:0;padding:0;display:grid;grid-template-columns:repeat(3,1fr);gap:18px}
+.jg{display:flex;flex-direction:column;gap:12px;padding:26px 22px 24px;border-radius:22px;background:#fff}
+.jg-ic{width:48px;height:48px;border-radius:50%;display:grid;place-items:center;background:var(--mint);color:#3F6E34}
+.jg-ic svg{width:26px;height:26px}
+.jg h3{font-size:18px;line-height:1.6;letter-spacing:.06em;margin-bottom:6px}
+.jg p{font-size:16px;line-height:1.9;color:var(--sub)}
+.jg-ask{margin:22px auto 0;text-align:center;font-size:16px;line-height:1.9;color:var(--sub)}
+.jg-sp{margin:40px auto 0;max-width:760px;padding:24px 26px 26px;border-radius:22px;background:transparent;border:2px dashed #E3D3C2}
+.jg-sp h3{font-size:17px;letter-spacing:.06em;margin-bottom:8px;color:var(--sub)}
+.jg-sp p{font-size:15.5px;line-height:1.9;color:var(--sub)}
+.jg-sp-link{display:inline-block;margin-top:14px;line-height:1.7;font-family:var(--maru);font-weight:700;font-size:15px;color:var(--terra-dk);text-underline-offset:5px}
+.jg-sp-link span::after{content:"\2060\00a0\2197";font-size:.9em;text-decoration:none}
+@media (max-width:760px){
+  .jg-list{grid-template-columns:1fr;gap:14px}
+  .jg{flex-direction:row;align-items:flex-start;gap:16px;padding:22px 20px}
+  .jg-ic{flex:none}
+  .jg-lead{text-align:left}
+  .jg-ask{text-align:left}
+  .jg-sp{margin-top:30px;padding:22px 20px}
+}
