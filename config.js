@@ -48,6 +48,8 @@ window.GURURI_CONFIG = {
   //   { name: "〇〇不動産 ひばりヶ丘店", plan: "card", category: "不動産", text: "ひばりヶ丘の暮らしを、これからも一緒に。", cardText: "ひばりヶ丘で40年。このまちの住まいのご相談にのってきました。", url: "https://example.com", start: "2026-12-01", end: "2027-02-28" },
   //   { name: "〇〇クリニック", plan: "support", category: "医療・歯科", text: "駅から歩いて3分の内科・小児科です。", url: "https://example.com", start: "2026-12-01", end: "2027-05-31" },
   sponsorCardMax: 2,
+  // 季節の飾り（2026-11-23）。"auto"＝予定表（seasons.csv）どおり（ふだんはこれ）／"off"＝飾りを止める／"december" など＝その飾りに固定
+  season: "auto",
   sponsors: [
   ]
 };
