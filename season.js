@@ -44,6 +44,55 @@
     var hd = document.querySelector('.hd');
     if (hd) hd.appendChild(el('div', 'x-lights'));
 
+    // 2b. アイコンの帯（コーヒー・かばんなど）を、クリスマスの絵に入れかえる（2026-11-23・ラテさんの案）
+    var row = document.querySelector('.strip > div');
+    if (row) {
+      var cnt = row.children.length || 12, icons = '';
+      for (var c = 0; c < cnt; c++) icons += XICONS[c % XICONS.length];
+      row.innerHTML = icons;
+      row.classList.add('x-icons');
+    }
+
+    // 2a. いちばん上の色のブロックのイラスト（コーヒー・かばんなど）を、クリスマスの絵に（2026-11-23・ラテさんの案）
+    //     写真と入れ替わるたびに新しいイラストが入るので、入ってきたイラストを見張って、そのつど入れかえる
+    var tilesWrap = document.querySelector('.tiles');
+    if (tilesWrap) {
+      var tileMap = {}, tileNext = 0;
+      var xmasTile = function (svg) {
+        if (!svg || svg.getAttribute('data-x')) return;
+        var key = svg.innerHTML;
+        if (!(key in tileMap)) tileMap[key] = tileNext++ % XTILES.length;
+        var color = svg.getAttribute('stroke') || '#3A2A24';
+        var tmp = document.createElement('div');
+        tmp.innerHTML = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.3" stroke-linecap="round" stroke-linejoin="round" data-x="1" style="color:' + color + '">' + XTILES[tileMap[key]] + '</svg>';
+        svg.parentNode.replaceChild(tmp.firstChild, svg);
+      };
+      [].forEach.call(tilesWrap.querySelectorAll('svg'), xmasTile);
+      if ('MutationObserver' in window) new MutationObserver(function (ms) {
+        ms.forEach(function (m) { [].forEach.call(m.addedNodes, function (n) {
+          if (n.nodeType !== 1) return;
+          if (n.tagName && n.tagName.toLowerCase() === 'svg') xmasTile(n);
+          else [].forEach.call(n.querySelectorAll ? n.querySelectorAll('svg') : [], xmasTile);
+        }); });
+      }).observe(tilesWrap, { childList: true, subtree: true });
+    }
+
+    // 2c. 開いた瞬間：最初の写真の上を、サンタのそりが1回飛んでいく（ラテさんの案：開いてすぐ「クリスマスだ！」と感じられるように）
+    //     サンタは1人だけ：上のそりが飛び終わるまで、アイコンの帯のそりは飛ばない（2026-11-23・G指示）
+    var onceBusy = false, afterOnce = [];
+    var onceEnd = function () { if (!onceBusy) return; onceBusy = false; afterOnce.forEach(function (f) { f(); }); afterOnce = []; };
+    var top = document.querySelector('.hero');
+    if (top && !calm) {
+      var hs = el('div', 'x-sky x-sky-hero');
+      var once = el('div', 'x-sleigh is-once', SLEIGH);
+      hs.appendChild(once);
+      top.appendChild(hs);
+      onceBusy = true;
+      once.addEventListener('animationend', onceEnd);
+      setTimeout(onceEnd, 7600);
+    }
+    var whenFree = function (f) { if (onceBusy) afterOnce.push(f); else f(); };
+
     // 3. 夜空をかけるそりと、またたく星（お店をさがす：アイコンの帯／ほかのページ：最初の見出しの場所）
     var hero = document.querySelector('.strip, .c-hero, .jn-hero');   // お店をさがすページは、写真の下の、アイコンが並ぶ落ち着いた帯の上を飛ぶ
     if (hero) {
@@ -61,9 +110,9 @@
       // 帯が画面に入ったときに、そりが飛びはじめる（見ていないところで飛び終わらないように）
       if (!calm) {
         if ('IntersectionObserver' in window) {
-          var io = new IntersectionObserver(function (es) { es.forEach(function (e) { if (e.isIntersecting) { sl.classList.add('is-go'); io.disconnect(); } }); }, { threshold: 0.6 });
+          var io = new IntersectionObserver(function (es) { es.forEach(function (e) { if (e.isIntersecting) { io.disconnect(); whenFree(function () { sl.classList.add('is-go'); }); } }); }, { threshold: 0.6 });
           io.observe(hero);
-        } else sl.classList.add('is-go');
+        } else whenFree(function () { sl.classList.add('is-go'); });
       }
     }
 
@@ -105,6 +154,35 @@
     // プレゼントの袋
     + '<path d="M196 30c-4 6-4 14 0 16h14c3-4 2-12-3-17z" fill="#2F7A55"/><path d="M199 31c2-3 6-3 8-1" stroke="#E7B547" stroke-width="2" fill="none"/>'
     + '</svg>';
+
+  // いちばん上の色のブロックのクリスマスの絵（線の絵。線の色は、もとのイラストと同じ＝ブロックの色に合わせた白か焦げ茶。金と赤を少しだけ）
+  var XTILES = [
+    // ツリー
+    '<path d="M12 4.5l3.6 4.8h-2l4.4 5.6h-2.4L20 20.5H4l4.4-5.6H6l4.4-5.6h-2z"/><path d="M12 20.5V22"/><path d="M12 1.2l.8 1.7 1.8.2-1.3 1.2.3 1.8-1.6-.9-1.6.9.3-1.8-1.3-1.2 1.8-.2z" fill="#E7B547" stroke="#E7B547" stroke-width=".6"/><circle cx="10.4" cy="12" r=".9" fill="#D9413B" stroke="none"/><circle cx="14" cy="16.6" r=".9" fill="#E7B547" stroke="none"/><circle cx="9.4" cy="18" r=".9" fill="#D9413B" stroke="none"/>',
+    // プレゼント
+    '<rect x="4" y="10" width="16" height="10.5" rx="1.2"/><rect x="3" y="7" width="18" height="3.4" rx="1"/><path d="M12 7v13.5"/><path d="M12 7C9.6 3.4 6.6 4.2 7.4 6s3.8 1 4.6 1zm0 0c2.4-3.6 5.4-2.8 4.6-1S12.8 7 12 7z" fill="#D9413B" stroke="#D9413B"/>',
+    // くつした
+    '<path d="M8.5 3.5h7v9l2.6 3.1a3.3 3.3 0 0 1-4.8 4.5L9 16.2a2 2 0 0 1-.5-1.4z"/><path d="M7.5 3.5h9v3.4h-9z" fill="currentColor" fill-opacity=".25"/><path d="M12 10.2l.6 1.3 1.4.2-1 1 .2 1.4-1.2-.7-1.2.7.2-1.4-1-1 1.4-.2z" fill="#E7B547" stroke="#E7B547" stroke-width=".5"/>',
+    // ベル
+    '<path d="M12 5a5.5 5.5 0 0 1 5.5 5.5v4l1.8 2.5H4.7l1.8-2.5v-4A5.5 5.5 0 0 1 12 5z"/><path d="M10.4 19.5a1.8 1.8 0 0 0 3.2 0"/><path d="M12 5C9.7 2.6 7 3.8 8.2 5.3S11.2 5.2 12 5zm0 0c2.3-2.4 5-1.2 3.8.3S12.8 5.2 12 5z" fill="#D9413B" stroke="#D9413B"/>',
+    // 雪だるま
+    '<circle cx="12" cy="15.6" r="5"/><circle cx="12" cy="8.2" r="3.4"/><path d="M9.2 4.4h5.6M10 4.4V2.2h4v2.2"/><path d="M8.8 11.3h6.4M14.2 11.4l1.3 3" stroke="#D9413B" stroke-width="1.6"/><circle cx="10.9" cy="7.8" r=".55" fill="currentColor" stroke="none"/><circle cx="13.1" cy="7.8" r=".55" fill="currentColor" stroke="none"/><circle cx="12" cy="14.6" r=".6" fill="currentColor" stroke="none"/><circle cx="12" cy="17" r=".6" fill="currentColor" stroke="none"/>',
+    // リース
+    '<circle cx="12" cy="12" r="7"/><circle cx="12" cy="12" r="4.4"/><path d="M6.6 8.6l1.2.9M17.4 8.6l-1.2.9M6.2 14.6l1.4-.4M17.8 14.6l-1.4-.4M12 5v1.4"/><path d="M12 18.4c-2.4-2.2-5-.9-3.7.8S11.1 18.7 12 18.4zm0 0c2.4-2.2 5-.9 3.7.8S12.9 18.7 12 18.4z" fill="#D9413B" stroke="#D9413B"/><circle cx="8" cy="10" r=".8" fill="#D9413B" stroke="none"/><circle cx="16.2" cy="10.4" r=".8" fill="#E7B547" stroke="none"/>'
+  ];
+
+  // アイコンの帯のクリスマスの絵（オリジナル）：ツリー・プレゼント・くつした・ベル・雪だるま・キャンディケイン・星・リース
+  var XI = function (inner) { return '<svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">' + inner + '</svg>'; };
+  var XICONS = [
+    XI('<path d="M12 3.5l3.4 4.6h-1.9l4.2 5.4h-2.2l4.5 5.8H4l4.5-5.8H6.3l4.2-5.4H8.6z" fill="#2F7A55"/><rect x="10.6" y="19.3" width="2.8" height="3" rx=".6" fill="#9A6A48"/><path d="M12 .8l.9 1.9 2 .3-1.5 1.4.4 2-1.8-1-1.8 1 .4-2-1.5-1.4 2-.3z" fill="#E7B547"/><circle cx="10.3" cy="11" r="1" fill="#D9413B"/><circle cx="14" cy="15" r="1" fill="#E7B547"/><circle cx="9.2" cy="17" r="1" fill="#F3A6B8"/><circle cx="13.2" cy="9.4" r=".8" fill="#E7B547"/>'),
+    XI('<rect x="3.5" y="10" width="17" height="11" rx="1.5" fill="#D9413B"/><rect x="2.5" y="7.5" width="19" height="4" rx="1.2" fill="#E5534C"/><rect x="10.7" y="7.5" width="2.6" height="13.5" fill="#E7B547"/><path d="M12 7.5C9.5 3.5 6 4.5 7 6.6S11 7.6 12 7.5zM12 7.5c2.5-4 6-3 5 -0.9S13 7.6 12 7.5z" fill="#E7B547"/>'),
+    XI('<path d="M8 3h8v9.5l2.8 3.2a3.6 3.6 0 0 1-5.2 5L8.6 16A2 2 0 0 1 8 14.5z" fill="#D9413B"/><rect x="7" y="2" width="10" height="4.2" rx="1.4" fill="#FFFFFF" stroke="#E6DCCB" stroke-width=".6"/><path d="M12 10.5l.8 1.6 1.7.2-1.2 1.2.3 1.7-1.6-.8-1.6.8.3-1.7-1.2-1.2 1.7-.2z" fill="#E7B547"/>'),
+    XI('<path d="M12 4a6 6 0 0 1 6 6v4.5l2 2.5H4l2-2.5V10a6 6 0 0 1 6-6z" fill="#E7B547"/><circle cx="12" cy="19.4" r="2" fill="#C9962E"/><path d="M12 4c-2.6-2.4-5.6-1-4.2.6S11.2 4.4 12 4zm0 0c2.6-2.4 5.6-1 4.2.6S12.8 4.4 12 4z" fill="#D9413B"/><path d="M8.4 9.5c.3-1.6 1.4-2.7 2.8-3" stroke="#FFF3CF" stroke-width="1.2" stroke-linecap="round" fill="none"/>'),
+    XI('<circle cx="12" cy="16" r="5.6" fill="#FFFFFF" stroke="#A9C3DA" stroke-width="1"/><circle cx="12" cy="8.2" r="3.8" fill="#FFFFFF" stroke="#A9C3DA" stroke-width="1"/><rect x="8.6" y="2" width="6.8" height="3.4" rx=".8" fill="#3A2A24"/><rect x="7.4" y="4.8" width="9.2" height="1.4" rx=".7" fill="#3A2A24"/><path d="M8.2 11.4h7.6l-1 1.6H9.2z" fill="#D9413B"/><path d="M14.2 11.6l1.4 3.4" stroke="#D9413B" stroke-width="1.6" stroke-linecap="round"/><circle cx="10.8" cy="7.8" r=".55" fill="#3A2A24"/><circle cx="13.2" cy="7.8" r=".55" fill="#3A2A24"/><path d="M12 8.8l2.6.7-2.6.5z" fill="#F08A3C"/><circle cx="12" cy="15" r=".6" fill="#3A2A24"/><circle cx="12" cy="17.4" r=".6" fill="#3A2A24"/>'),
+    XI('<path d="M9 21V8.5a3.5 3.5 0 0 1 7 0V10" stroke="#FFFFFF" stroke-width="3.4" stroke-linecap="round" fill="none"/><path d="M9 21V8.5a3.5 3.5 0 0 1 7 0V10" stroke="#D9413B" stroke-width="3.4" stroke-linecap="round" stroke-dasharray="2.2 2.2" fill="none"/><path d="M9 21V8.5a3.5 3.5 0 0 1 7 0V10" stroke="#E6DCCB" stroke-width=".5" fill="none" transform="translate(-1.9 0)"/>'),
+    XI('<path d="M12 2l2.8 6 6.5.7-4.9 4.4 1.4 6.4L12 16.3 6.2 19.5l1.4-6.4L2.7 8.7l6.5-.7z" fill="#E7B547"/><path d="M12 5.6l1.6 3.5" stroke="#FFF3CF" stroke-width="1.2" stroke-linecap="round"/>'),
+    XI('<circle cx="12" cy="12" r="7.2" stroke="#2F7A55" stroke-width="4" fill="none"/><circle cx="12" cy="12" r="7.2" stroke="#3F9468" stroke-width="1.6" stroke-dasharray="1.5 2.5" fill="none"/><circle cx="7" cy="9" r="1" fill="#D9413B"/><circle cx="17.4" cy="10" r="1" fill="#D9413B"/><circle cx="15" cy="17.6" r="1" fill="#E7B547"/><path d="M12 18.5c-2.6-2.4-5.4-1-4 .8S11 18.8 12 18.5zm0 0c2.6-2.4 5.4-1 4 .8S13 18.8 12 18.5z" fill="#D9413B"/>')
+  ];
 
   // 雪の積もった街並み（ページのいちばん下）
   var TOWN = '<svg viewBox="0 0 1072 90" preserveAspectRatio="none" xmlns="http://www.w3.org/2000/svg">'

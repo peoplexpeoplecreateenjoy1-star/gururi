@@ -67,8 +67,9 @@
 /* 見出しの文字のまわりに、赤いリボンとひいらぎ */
 .season-december .hero-copy{z-index:4}
 .season-december .hero-copy h1{position:relative}
-.season-december .hero-copy h1::before{content:"";position:absolute;left:-18px;top:-20px;width:54px;height:44px;
-  background:center/contain no-repeat url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 54 44'%3E%3Cpath d='M27 20C18 6 4 6 5 16s14 8 22 4z' fill='%23D9413B'/%3E%3Cpath d='M27 20c9-14 23-14 22-4s-14 8-22 4z' fill='%23D9413B'/%3E%3Cpath d='M25 21l-10 20 7-3 3 5 3-20zM29 21l10 20-7-3-3 5-3-20z' fill='%23B7322D'/%3E%3Ccircle cx='27' cy='20' r='5' fill='%23F05A52'/%3E%3Cpath d='M12 14c3-3 8-3 11 1' stroke='%23F7B0AA' stroke-width='2' fill='none' stroke-linecap='round'/%3E%3C/svg%3E");transform:rotate(-12deg)}
+.season-december .hero-copy h1::before{content:"";position:absolute;left:-30px;top:-40px;width:78px;height:62px;z-index:2;
+  background:center/contain no-repeat url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 78 62'%3E%3Cpath d='M10 44C14 22 30 6 50 8c10 1 16 9 18 20-6-5-12-7-17-4 6 4 8 12 6 20z' fill='%23D9413B'/%3E%3Cpath d='M50 8c10 1 16 9 18 20-3-2-6-3-9-3 0-7-4-13-9-17z' fill='%23B7322D'/%3E%3Cpath d='M22 20c5-7 13-10 20-9' stroke='%23F05A52' stroke-width='3' stroke-linecap='round' fill='none'/%3E%3Ccircle cx='69' cy='30' r='7' fill='%23FFFFFF' stroke='%23E6DCCB' stroke-width='1.2'/%3E%3Crect x='4' y='40' width='58' height='14' rx='7' fill='%23FFFFFF' stroke='%23E6DCCB' stroke-width='1.2' transform='rotate(-4 33 47)'/%3E%3C/svg%3E");
+  transform:rotate(-16deg);filter:drop-shadow(0 3px 3px rgba(58,42,36,.18))}
 .season-december .hero-copy h1::after{content:"";position:absolute;right:-14px;bottom:-16px;width:46px;height:34px;
   background:center/contain no-repeat url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 46 34'%3E%3Cpath d='M22 18C14 4 4 8 2 14c6-2 8 2 6 6 6-2 8 2 6 6 4-4 8-6 8-8z' fill='%232F7A55'/%3E%3Cpath d='M24 18c8-14 18-10 20-4-6-2-8 2-6 6-6-2-8 2-6 6-4-4-8-6-8-8z' fill='%233F9468'/%3E%3Ccircle cx='20' cy='20' r='4.5' fill='%23D9413B'/%3E%3Ccircle cx='27' cy='21' r='4.5' fill='%23E2504A'/%3E%3Ccircle cx='23.5' cy='26' r='4.5' fill='%23C93A35'/%3E%3C/svg%3E")}
 
@@ -122,7 +123,7 @@
 /* スマホ */
 @media (max-width:760px){
   .season-december .x-lights{bottom:-14px;transform:scale(.85);transform-origin:left top;width:118%}
-  .season-december .hero-copy h1::before{left:-14px;top:-18px;width:44px;height:36px}
+  .season-december .hero-copy h1::before{left:-22px;top:-32px;width:62px;height:50px}
   .season-december .hero-copy h1::after{right:-10px;bottom:-14px;width:38px;height:28px}
   .season-december .x-ribbon{font-size:12.5px;padding:10px 0}
   .season-december .card-pic::after{width:28px;height:35px;right:12px}
@@ -137,4 +138,21 @@
   .season-december .x-lights::before,.season-december .x-lights::after,
   .season-december .x-tw,.season-december .dots span,.season-december .x-ribbon-in{animation:none}
   .season-december .x-sleigh{left:auto;right:3%;animation:none}
+}
+
+/* 2026-11-23 ラテさんの案：開いた瞬間に「クリスマスだ！」 */
+/* アイコンの帯：クリスマスの絵に入れかえ（色つき・くっきり） */
+.season-december .strip .x-icons{opacity:1}
+.season-december .strip .x-icons svg{width:40px;height:40px;animation:x-bob 2.8s ease-in-out infinite}
+.season-december .strip .x-icons svg:nth-child(2n){animation-delay:-1.4s}
+@keyframes x-bob{0%,100%{transform:translateY(0) rotate(-4deg)}50%{transform:translateY(-3px) rotate(4deg)}}
+/* 開いた瞬間：最初の写真の上を、そりが1回飛んでいく（写真の上でも見えるよう、白いふちどり） */
+.season-december .hero{position:relative}
+.season-december .x-sky-hero{z-index:3}
+.season-december .x-sleigh.is-once{top:7%;width:min(300px,64vw);
+  filter:drop-shadow(0 0 1.5px #fff) drop-shadow(0 0 1.5px #fff) drop-shadow(0 0 1.5px #fff) drop-shadow(0 5px 8px rgba(0,0,0,.28));
+  animation:x-fly-once 6.5s cubic-bezier(.4,.1,.6,.9) .6s 1 both}
+@keyframes x-fly-once{0%{transform:translate(0,34px) rotate(-5deg)}100%{transform:translate(calc(-100vw - 320px),-18px) rotate(3deg)}}
+@media (prefers-reduced-motion: reduce){
+  .season-december .strip .x-icons svg{animation:none}
 }
