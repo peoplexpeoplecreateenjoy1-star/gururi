@@ -13,7 +13,11 @@ window.GURURI_CONFIG = {
   wazanohito: "https://ykt5da.s.gy/wazanohito-explore",
   joinForm: "https://ykt5da.s.gy/google-form-access",
   // 「掲載について」ページの「協賛について問い合わせる」のリンク先（2026-11-22・G指定：TORIMICHのお問い合わせ）
-  sponsorContact: "https://ykt5da.s.gy/ask-torimich",
+  sponsorContact: "contact.html#sponsor",   // 2026-11-26：ぐるりのお問い合わせページの「協賛」のカードへ（前は通り道のお問い合わせ https://ykt5da.s.gy/ask-torimich）
+  // ぐるりのお問い合わせ（contact.html）のボタンの行き先。お問い合わせフォームのスクリプト（setupContactForm）の実行ログに出る3つのリンクを貼る。
+  //   listing＝掲載について／sponsor＝協賛について／other＝そのほか。空のあいだは contactFallback（通り道のお問い合わせ）へ。
+  contactForms: { listing: "https://docs.google.com/forms/d/e/1FAIpQLSfdMa8aA5nn5EDFijTpxJwlCVVUxTxnHaRNCn2i6mzQHG5xKg/viewform?usp=pp_url&entry.1301850130=%E6%8E%B2%E8%BC%89%E3%81%AB%E3%81%A4%E3%81%84%E3%81%A6", sponsor: "https://docs.google.com/forms/d/e/1FAIpQLSfdMa8aA5nn5EDFijTpxJwlCVVUxTxnHaRNCn2i6mzQHG5xKg/viewform?usp=pp_url&entry.1301850130=%E5%8D%94%E8%B3%9B%E3%81%AB%E3%81%A4%E3%81%84%E3%81%A6", other: "https://docs.google.com/forms/d/e/1FAIpQLSfdMa8aA5nn5EDFijTpxJwlCVVUxTxnHaRNCn2i6mzQHG5xKg/viewform?usp=pp_url&entry.1301850130=%E3%81%9D%E3%81%AE%E3%81%BB%E3%81%8B" },
+  contactFallback: "https://ykt5da.s.gy/ask-torimich",
   torimichHome: "https://ykt5da.s.gy/torimich-explore",
   latteInstagram: "https://ykt5da.s.gy/seibu-cafe",
 

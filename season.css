@@ -141,18 +141,20 @@
 }
 
 /* 2026-11-23 ラテさんの案：開いた瞬間に「クリスマスだ！」 */
-/* アイコンの帯：クリスマスの絵に入れかえ（色つき・くっきり） */
-.season-december .strip .x-icons{opacity:1}
-.season-december .strip .x-icons svg{width:40px;height:40px;animation:x-bob 2.8s ease-in-out infinite}
-.season-december .strip .x-icons svg:nth-child(2n){animation-delay:-1.4s}
-@keyframes x-bob{0%,100%{transform:translateY(0) rotate(-4deg)}50%{transform:translateY(-3px) rotate(4deg)}}
-/* 開いた瞬間：最初の写真の上を、そりが1回飛んでいく（写真の上でも見えるよう、白いふちどり） */
+/* 2026-11-26：アイコンの帯をなくしたので、そりは写真の3段目のいちばん下のふちに沿って、右から左へ走る */
 .season-december .hero{position:relative}
 .season-december .x-sky-hero{z-index:3}
-.season-december .x-sleigh.is-once{top:7%;width:min(300px,64vw);
-  filter:drop-shadow(0 0 1.5px #fff) drop-shadow(0 0 1.5px #fff) drop-shadow(0 0 1.5px #fff) drop-shadow(0 5px 8px rgba(0,0,0,.28));
-  animation:x-fly-once 6.5s cubic-bezier(.4,.1,.6,.9) .6s 1 both}
-@keyframes x-fly-once{0%{transform:translate(0,34px) rotate(-5deg)}100%{transform:translate(calc(-100vw - 320px),-18px) rotate(3deg)}}
-@media (prefers-reduced-motion: reduce){
-  .season-december .strip .x-icons svg{animation:none}
-}
+.season-december .x-sky-hero .x-sleigh{top:auto;bottom:0;width:min(230px,52vw);
+  filter:drop-shadow(0 0 1.5px #fff) drop-shadow(0 0 1.5px #fff) drop-shadow(0 0 1.5px #fff) drop-shadow(0 4px 6px rgba(0,0,0,.25))}
+.season-december .x-sky-hero .x-sleigh.is-go{animation:x-run 11s cubic-bezier(.4,.1,.6,.9) .6s infinite}
+@keyframes x-run{
+  0%{transform:translate(0,0)}
+  8%{transform:translate(calc(-0.14 * (100vw + 260px)),-3px)}
+  16%{transform:translate(calc(-0.28 * (100vw + 260px)),0)}
+  24%{transform:translate(calc(-0.42 * (100vw + 260px)),-3px)}
+  32%{transform:translate(calc(-0.56 * (100vw + 260px)),0)}
+  40%{transform:translate(calc(-0.70 * (100vw + 260px)),-3px)}
+  48%{transform:translate(calc(-0.84 * (100vw + 260px)),0)}
+  55%,100%{transform:translate(calc(-1 * (100vw + 260px)),0)}}
+.season-december .x-sky-hero .x-sleigh.is-still{left:auto;right:3%;bottom:0;animation:none}
+

@@ -11,6 +11,65 @@
     if (url) a.href = url;
   });
 
+  /* ───── 右上の三本線のメニュー（2026-11-26・G依頼） ─────
+     どのページでも、言語の選択のとなりに出す。押すと右からメニューが出る（トップ・お店をさがす・クーポン・
+     ぐるりについて・わざのひと・掲載について・協賛について・お問い合わせ・プライバシーポリシー・Instagram（公式のロゴ））。通り道へのリンクは置かない（2026-11-26・G）。 */
+  (function () {
+    var hdIn = document.querySelector('.hd-in');
+    if (!hdIn) return;
+    var ITEMS = [
+      ['menu.top', 'index.html'], ['menu.shops', 'index.html#shops'], ['menu.coupons', 'index.html#coupons'],
+      ['nav.about', 'concept.html'], ['nav.waza', CFG.wazanohito || '#', 'waza'], ['nav.join', 'join.html'],
+      ['menu.sponsor', 'join.html#jn-guide'], ['menu.contact', 'contact.html'], ['nav.privacy', 'privacy.html']
+    ];
+    var IG = '<img src="assets/instagram.png" alt="" width="22" height="22">';   // Instagram の公式のロゴ（2026-11-26・G指示）
+    var btn = document.createElement('button');
+    btn.type = 'button'; btn.className = 'menu-btn'; btn.setAttribute('aria-expanded', 'false'); btn.setAttribute('aria-controls', 'gm');
+    btn.innerHTML = '<span></span><span></span><span></span>';
+    hdIn.appendChild(btn);
+    var gm = document.createElement('div');
+    gm.className = 'gm'; gm.id = 'gm'; gm.hidden = true;
+    document.body.appendChild(gm);
+    var here = (location.pathname.split('/').pop() || 'index.html');
+    function draw() {
+      btn.setAttribute('aria-label', T('menu.open'));
+      gm.innerHTML = '<div class="gm-back" data-gm-close></div><nav class="gm-panel" aria-label="' + T('nav.menu') + '">'
+        + '<button type="button" class="gm-close" data-gm-close aria-label="' + T('menu.close') + '"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M6 6l12 12M18 6L6 18"/></svg></button>'
+        + '<ul>' + ITEMS.map(function (it) {
+          var cur = it[1] === here ? ' aria-current="page"' : '';
+          var ext = it[2] === 'waza' ? ' target="_blank" rel="noopener" data-waza' : '';
+          return '<li' + (it[2] === 'waza' ? ' data-waza' : '') + '><a href="' + it[1] + '"' + cur + ext + '>' + T(it[0]) + '</a></li>';
+        }).join('') + '</ul>'
+        + '<p class="gm-sub">'
+        + (CFG.instagram ? '<a href="' + CFG.instagram + '" target="_blank" rel="noopener" class="gm-ig">' + IG + '<span>' + T('menu.ig') + '<small>@gururi_hibarigaoka</small></span></a>' : '')
+        + '</p></nav>';
+    }
+    function open() {
+      draw(); gm.hidden = false; btn.setAttribute('aria-expanded', 'true');
+      document.documentElement.classList.add('gm-open');
+      requestAnimationFrame(function () { gm.classList.add('is-on'); var f = gm.querySelector('.gm-panel a'); if (f) f.focus(); });
+    }
+    function close(back) {
+      if (gm.hidden) return;
+      gm.classList.remove('is-on'); btn.setAttribute('aria-expanded', 'false');
+      document.documentElement.classList.remove('gm-open');
+      setTimeout(function () { gm.hidden = true; }, 220);
+      if (back) btn.focus();
+    }
+    btn.addEventListener('click', function () { if (gm.hidden) open(); else close(true); });
+    gm.addEventListener('click', function (e) {
+      if (e.target.closest('[data-gm-close]')) { close(true); return; }
+      var a = e.target.closest('a');
+      if (a) {
+        try { if (typeof gtag === 'function') gtag('event', 'menu_click', { link_url: a.href, page: document.body.getAttribute('data-page') || '' }); } catch (x) {}
+        close(false);
+      }
+    });
+    document.addEventListener('keydown', function (e) { if (e.key === 'Escape') close(true); });
+    document.addEventListener('gururi:lang', function () { btn.setAttribute('aria-label', T('menu.open')); if (!gm.hidden) draw(); });
+    btn.setAttribute('aria-label', T('menu.open'));
+  })();
+
   // 「掲載について」ページ：数字で見るぐるり（config.js の joinStats.show が true のときだけ出す）
   var stats = document.getElementById('jn-stats'), JS = CFG.joinStats || {};
   if (stats && JS.show === true) {
@@ -1026,6 +1085,10 @@
       openShopFromQuery();
       // index.html#coupons で開いたときは、クーポンありのお店を出す（チラシやInstagramからのリンク用）
       if (location.hash === '#coupons' && shops.some(function (s) { return s.coupon && shownInLang(s); })) showCouponShops(false);
+      // 同じページでメニューの「クーポンのあるお店」を押したとき（2026-11-26）
+      window.addEventListener('hashchange', function () {
+        if (location.hash === '#coupons' && shops.some(function (s) { return s.coupon && shownInLang(s); })) showCouponShops(true);
+      });
     })
     .catch(function () {
       spApplyCap(0);

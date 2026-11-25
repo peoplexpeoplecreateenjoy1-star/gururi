@@ -35,6 +35,9 @@ p{margin:0}
 .tiles{display:grid;grid-template-columns:repeat(3,minmax(0,1fr))}
 .tile{aspect-ratio:4/3;display:flex;align-items:center;justify-content:center;position:relative;overflow:hidden}
 .tile svg{width:40%;height:auto}
+/* 2026-11-26（ラテさんの意見）：開いたときに、下の「こんなお店、あったんだ。」が少し見えて、
+   スクロールして見るページだと分かるように、写真の高さを画面の高さに合わせて抑える */
+@media (min-width:721px){.tile{aspect-ratio:auto;height:min(25vw,320px);height:clamp(150px,calc((100svh - 300px) / 2),min(25vw,320px))}}
 .tile-layer{position:absolute;inset:0;display:flex;align-items:center;justify-content:center;opacity:0;transform:scale(1.05);transition:opacity .9s ease,transform 1.8s ease}
 .tile-layer.is-on{opacity:1;transform:scale(1)}
 .tile-layer img{width:100%;height:100%;object-fit:cover}
@@ -162,6 +165,8 @@ p{margin:0}
 
 @media (max-width:720px){
   .tiles{grid-template-columns:repeat(2,minmax(0,1fr))}
+  .tile{aspect-ratio:auto;height:31vw;height:clamp(96px,calc((100svh - 300px) / 3),37.5vw)}
+  .tile svg{width:auto;height:52%}
   .hero-copy h1{font-size:17px;letter-spacing:.06em;white-space:nowrap;padding:.7em 1.3em}
   .vert-sp{writing-mode:horizontal-tb;height:auto !important}
   .c-hero h1{font-size:30px}
@@ -630,3 +635,50 @@ html[lang="ja"] .jn-guide p{word-break:normal;overflow-wrap:normal;line-break:st
   .jg p{font-size:15.5px}
   .jg-sp p{font-size:15px}
 }
+
+/* ───── 右上の三本線のメニュー（2026-11-26） ───── */
+.menu-btn{order:2;width:44px;height:44px;border:1.5px solid #D6C8B4;border-radius:999px;background:#fff;display:inline-flex;flex-direction:column;align-items:center;justify-content:center;gap:4px;cursor:pointer;padding:0;flex:0 0 auto}
+.menu-btn span{display:block;width:18px;height:2px;border-radius:2px;background:var(--ink)}
+.menu-btn:focus-visible{outline:3px solid var(--green);outline-offset:2px}
+.hd-in .lang{order:1}
+@media (min-width:721px){.hd-in .nav{order:0}.hd-in .lang{order:1;margin-left:0}.menu-btn{order:2}}
+@media (max-width:720px){.hd-in{display:grid;grid-template-columns:minmax(0,1fr) auto auto;align-items:center}.hd-in .nav{grid-column:1/-1}.hd-in .brand{min-width:0;overflow:hidden}.hd-in .brand .brand-area{white-space:nowrap;overflow:hidden;text-overflow:ellipsis;min-width:0}.hd-in .lang{order:1;margin-left:auto;min-height:40px;padding:0 8px 0 10px}.hd-in .lang-select{font-size:13px;padding-right:14px}.menu-btn{order:2;width:40px;height:40px}.hd-in .nav{order:3}}
+@media (max-width:440px){.hd-in{column-gap:8px}}
+.gm{position:fixed;inset:0;z-index:60}
+.gm-back{position:absolute;inset:0;background:rgba(58,42,36,.38);opacity:0;transition:opacity .22s ease}
+.gm-panel{position:absolute;top:0;right:0;bottom:0;width:min(340px,86vw);background:var(--kinari);box-shadow:-8px 0 24px rgba(58,42,36,.16);padding:72px 28px 32px;overflow-y:auto;transform:translateX(100%);transition:transform .22s ease;display:flex;flex-direction:column}
+.gm.is-on .gm-back{opacity:1}.gm.is-on .gm-panel{transform:none}
+.gm-close{position:absolute;top:16px;right:16px;width:44px;height:44px;border:0;border-radius:999px;background:#fff;cursor:pointer;display:flex;align-items:center;justify-content:center}
+.gm-close svg{width:20px;height:20px;stroke:var(--ink);stroke-width:2;stroke-linecap:round;fill:none}
+.gm-panel ul{list-style:none;margin:0;padding:0}
+.gm-panel li{border-bottom:1px solid var(--line)}
+.gm-panel li a{display:block;padding:15px 4px;color:var(--ink);text-decoration:none;font-family:var(--maru);font-weight:700;font-size:16px}
+.gm-panel li a[aria-current="page"]{color:var(--terra)}
+.gm-panel li a:hover{color:var(--terra)}
+.gm-sub{margin:auto 0 0;padding-top:28px;display:flex;flex-direction:column;gap:14px;font-size:13px}
+.gm-sub a{color:var(--sub);text-decoration:none;display:inline-flex;align-items:center;gap:10px}
+.gm-ig img{width:22px;height:22px;flex:0 0 auto;display:block}
+.gm-ig span{display:flex;flex-direction:column;line-height:1.4}.gm-ig small{font-size:12px;opacity:.8}
+html.gm-open{overflow:hidden}
+html:not(.show-waza) .gm [data-waza]{display:none}
+@media (prefers-reduced-motion:reduce){.gm-back,.gm-panel{transition:none}}
+
+/* ───── お問い合わせ（contact.html・2026-11-26） ───── */
+.ct{padding:56px 24px 88px}
+.ct-in{max-width:960px;margin:0 auto}
+.ct-title{font-family:var(--maru);font-weight:900;font-size:clamp(26px,3.4vw,36px);letter-spacing:.12em;text-align:center;margin:0 0 18px}
+.ct-lead{text-align:center;line-height:2;margin:0 0 36px}
+.ct-cards{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:18px}
+.ct-card{background:#fff;border:1px solid var(--line);border-radius:20px;padding:28px 24px 24px;display:flex;flex-direction:column;align-items:flex-start;scroll-margin-top:24px}
+.ct-card.is-here{border-color:var(--terra);box-shadow:0 0 0 3px #F2DDD0}
+.ct-ic{width:48px;height:48px;border-radius:999px;background:#F2DDD0;color:var(--terra-dk);display:flex;align-items:center;justify-content:center;margin-bottom:14px}
+.ct-ic svg{width:26px;height:26px}
+.ct-card h2{font-family:var(--maru);font-size:18px;line-height:1.6;margin:0 0 10px}
+.ct-card p{font-size:15px;line-height:1.9;margin:0 0 20px;flex:1}
+.ct-btn{align-self:stretch;text-align:center;justify-content:center}
+.ct-note,.ct-pp{text-align:center;font-size:14px;line-height:1.9;color:var(--sub);margin:28px 0 0}
+.ct-pp{margin-top:10px}
+@media (max-width:760px){.ct{padding:36px 16px 64px}.ct-cards{grid-template-columns:1fr}.ct-lead,.ct-note,.ct-pp{text-align:left}}
+@media (max-width:400px){html:not([lang="ja"]) .hd-in .brand .brand-area{font-size:11px;letter-spacing:.02em}}
+@media (max-width:430px){.hd-in{column-gap:8px;padding-left:16px;padding-right:16px}.hd-in .brand{gap:8px}.hd-in .brand img{height:34px;width:auto}.hd-in .brand .brand-area{font-size:14px;letter-spacing:.04em}}
+html[lang="ja"] .ct h1,html[lang="ja"] .ct h2,html[lang="ja"] .ct p{word-break:keep-all;overflow-wrap:anywhere}

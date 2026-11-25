@@ -44,15 +44,6 @@
     var hd = document.querySelector('.hd');
     if (hd) hd.appendChild(el('div', 'x-lights'));
 
-    // 2b. アイコンの帯（コーヒー・かばんなど）を、クリスマスの絵に入れかえる（2026-11-23・ラテさんの案）
-    var row = document.querySelector('.strip > div');
-    if (row) {
-      var cnt = row.children.length || 12, icons = '';
-      for (var c = 0; c < cnt; c++) icons += XICONS[c % XICONS.length];
-      row.innerHTML = icons;
-      row.classList.add('x-icons');
-    }
-
     // 2a. いちばん上の色のブロックのイラスト（コーヒー・かばんなど）を、クリスマスの絵に（2026-11-23・ラテさんの案）
     //     写真と入れ替わるたびに新しいイラストが入るので、入ってきたイラストを見張って、そのつど入れかえる
     var tilesWrap = document.querySelector('.tiles');
@@ -77,27 +68,14 @@
       }).observe(tilesWrap, { childList: true, subtree: true });
     }
 
-    // 2c. 開いた瞬間：最初の写真の上を、サンタのそりが1回飛んでいく（ラテさんの案：開いてすぐ「クリスマスだ！」と感じられるように）
-    //     サンタは1人だけ：上のそりが飛び終わるまで、アイコンの帯のそりは飛ばない（2026-11-23・G指示）
-    var onceBusy = false, afterOnce = [];
-    var onceEnd = function () { if (!onceBusy) return; onceBusy = false; afterOnce.forEach(function (f) { f(); }); afterOnce = []; };
-    var top = document.querySelector('.hero');
-    if (top && !calm) {
-      var hs = el('div', 'x-sky x-sky-hero');
-      var once = el('div', 'x-sleigh is-once', SLEIGH);
-      hs.appendChild(once);
-      top.appendChild(hs);
-      onceBusy = true;
-      once.addEventListener('animationend', onceEnd);
-      setTimeout(onceEnd, 7600);
-    }
-    var whenFree = function (f) { if (onceBusy) afterOnce.push(f); else f(); };
-
-    // 3. 夜空をかけるそりと、またたく星（お店をさがす：アイコンの帯／ほかのページ：最初の見出しの場所）
-    var hero = document.querySelector('.strip, .c-hero, .jn-hero');   // お店をさがすページは、写真の下の、アイコンが並ぶ落ち着いた帯の上を飛ぶ
+    // 3. そりが飛ぶ場所（2026-11-26・ラテさんの意見とG指示で、アイコンの帯をなくした）
+    //    お店をさがす：写真の3段目のいちばん下のふちに沿って、右から左へ走る（開いてすぐ1回、そのあとは見えているあいだ11秒ごと）
+    //    ほかのページ：最初の見出しの場所（今までどおり）。サンタはいつも1人だけ
+    var hero = document.querySelector('.hero') || document.querySelector('.c-hero, .jn-hero');
     if (hero) {
-      var sky = el('div', 'x-sky');
-      for (var s = 0; s < 9; s++) {
+      var onTiles = hero.classList.contains('hero');
+      var sky = el('div', 'x-sky' + (onTiles ? ' x-sky-hero' : ''));
+      if (!onTiles) for (var s = 0; s < 9; s++) {
         var st = el('i', 'x-tw');
         st.style.left = (6 + Math.random() * 88).toFixed(1) + '%';
         st.style.top = (6 + Math.random() * 70).toFixed(1) + '%';
@@ -107,17 +85,17 @@
       var sl = el('div', 'x-sleigh' + (calm ? ' is-still' : ''), SLEIGH);
       sky.appendChild(sl);
       hero.appendChild(sky);
-      // 帯が画面に入ったときに、そりが飛びはじめる（見ていないところで飛び終わらないように）
+      // 画面に入ったときに、そりが走りはじめる（見ていないところで走り終わらないように）
       if (!calm) {
         if ('IntersectionObserver' in window) {
-          var io = new IntersectionObserver(function (es) { es.forEach(function (e) { if (e.isIntersecting) { io.disconnect(); whenFree(function () { sl.classList.add('is-go'); }); } }); }, { threshold: 0.6 });
+          var io = new IntersectionObserver(function (es) { es.forEach(function (e) { if (e.isIntersecting) { io.disconnect(); sl.classList.add('is-go'); } }); }, { threshold: 0.3 });
           io.observe(hero);
-        } else whenFree(function () { sl.classList.add('is-go'); });
+        } else sl.classList.add('is-go');
       }
     }
 
-    // 4. 見出しのすぐ下に、くるくる流れるリボンの帯
-    var after = document.querySelector('.strip') || document.querySelector('.c-hero, .jn-hero');
+    // 4. 写真（見出し）のすぐ下に、くるくる流れるリボンの帯
+    var after = document.querySelector('.hero') || document.querySelector('.c-hero, .jn-hero');   // お店をさがす：写真のすぐ下
     if (after && after.parentNode) {
       var msg = 'Merry Christmas & Happy Holidays <b>✦</b> ぐるり ひばりヶ丘 <b>✦</b> ';
       var rib = el('div', 'x-ribbon', '<div class="x-ribbon-in"><span>' + Array(7).join(msg) + '</span><span>' + Array(7).join(msg) + '</span></div>');
