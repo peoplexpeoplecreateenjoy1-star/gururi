@@ -30,7 +30,9 @@
        plan "support"＝応援（ページ下の「ぐるりを応援してくれている会社」の欄だけ）
        plan "card"   ＝応援＋協賛カード（応援の欄にも自動で載り、お店一覧の中の協賛カードにも出る）
        （古い書き方の slot "A" は support、slot "B" は card として扱う）
-     協賛カードは、同時に CFG.sponsorCardMax 社まで（今は2社）・同じ業種（category）は1社まで。
+     協賛カードは、掲載店11軒につき1枠（2026-11-25・G確定：掲載店が増えると枠も増える。23軒なら2社）・同じ業種（category）は1社まで。
+       枠を超えたときはカードを外さず、注意だけ出す（ご契約中の会社を途中で外さないため）。
+       CFG.sponsorCardMax が "auto"（ふだん）なら、お店の数から自動で決める。数字を入れると、その数に固定する。
        超えたときは config.js の上に書いてある会社から順に出し、残りはカードに出さない（応援の欄には出る）。
        気づけるように、ブラウザの開発者向けの表示に注意を出し、URLの末尾に ?check=sponsors を付けて開くと、画面の上にも出す。
      リンクには、ぐるりから来たことが分かる印（utm_source=gururi&utm_medium=sponsor、欄かカードかを utm_content）を自動で付ける。
@@ -38,7 +40,9 @@
      編集の独立：協賛していても、掲載店の並び順・紹介・表示は変えない。お店のカードに広告の印は付けない。
      計測：sponsor_view（枠が画面の半分以上に入ったとき、1回の表示につき1回）／sponsor_click。パラメータ sponsor_name・slot（A／B）・position（カードの何番目の枠か） */
   var SP_MAX = { A: 40, B: 80 };   // ひとことの文字数の目安（超えた分は、Aは3行・Bは4行で「…」に）
-  var SP_CARD_MAX = Number(CFG.sponsorCardMax) > 0 ? Number(CFG.sponsorCardMax) : 2;
+  var SP_PER_SHOPS = 11;   // お店11軒につき協賛カード1枠
+  var SP_CARD_FIXED = Number(CFG.sponsorCardMax) > 0 ? Number(CFG.sponsorCardMax) : 0;   // 0＝自動
+  function spCardMaxFor(n) { return SP_CARD_FIXED || Math.floor(n / SP_PER_SHOPS); }
   var spIssues = [];
   function spEsc(s) { return String(s == null ? '' : s).replace(/[&<>"']/g, function (c) { return { '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]; }); }
   function spToday() { var d = new Date(); return d.getFullYear() + '-' + ('0' + (d.getMonth() + 1)).slice(-2) + '-' + ('0' + d.getDate()).slice(-2); }
@@ -62,23 +66,35 @@
       var cat = String(s.category || '').trim();
       if (!cat) spIssues.push('「' + s.name + '」の業種（category）が空です。同じ業種の確認ができません。');
       if (cat && cats[cat]) { spIssues.push('協賛カードで同じ業種「' + cat + '」が重なっています：「' + cats[cat] + '」と「' + s.name + '」。カードには「' + cats[cat] + '」だけを出し、「' + s.name + '」は応援の欄だけに出しています。'); return; }
-      if (out.length >= SP_CARD_MAX) { spIssues.push('協賛カードの上限（' + SP_CARD_MAX + '社）を超えています。「' + s.name + '」はカードに出さず、応援の欄だけに出しています。'); return; }
       if (cat) cats[cat] = s.name;
       out.push(s);
     });
     return out;
   })();
-  if (spIssues.length) {
-    if (window.console) spIssues.forEach(function (m) { console.warn('【ぐるり協賛】' + m); });
-    if (/[?&]check=sponsors\b/.test(location.search)) (function (fn) { if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', fn); else fn(); })(function () {
-      var bar = document.createElement('div');
-      bar.setAttribute('role', 'alert');
-      bar.style.cssText = 'position:sticky;top:0;z-index:999;background:#FFF3CD;color:#5A4300;border-bottom:2px solid #E0B200;padding:12px 16px;font-size:14px;line-height:1.7';
-      bar.innerHTML = '<b>協賛の設定の確認</b><br>' + spIssues.map(spEsc).join('<br>');
-      document.body.insertBefore(bar, document.body.firstChild);
-    });
-  } else if (/[?&]check=sponsors\b/.test(location.search) && window.console) {
-    console.info('【ぐるり協賛】設定に問題はありません（応援の欄 ' + spAll.length + '社・協賛カード ' + spCards.length + '社）');
+  var spCardsAll = spCards;
+  // お店の数がわかったら、協賛カードの枠の数を確かめる。
+  //   枠は「新しくお受けできるか」の目安。お店が閉店などで減って枠を超えても、ご契約中の会社のカードは外さない（約束を守る）。
+  //   超えているときは注意だけ出す（新しいお申し込みは、空きが出るまで応援の欄からご案内する）。
+  function spApplyCap(n) {
+    var max = spCardMaxFor(n);
+    spCards = spCardsAll.slice();
+    if (n > 0 && spCards.length > max) spIssues.push('協賛カードが ' + spCards.length + '社で、枠の目安（掲載店' + n + '軒で' + max + '社' + (SP_CARD_FIXED ? '・config.js で固定' : '・11軒につき1枠') + '）を超えています。ご契約中の会社のカードはそのまま出しています。新しいお申し込みは、空きが出るまで応援の欄からご案内してください。');
+    spOrderB = null;
+    spReport(n, max);
+  }
+  function spReport(n, max) {
+    if (spIssues.length) {
+      if (window.console) spIssues.forEach(function (m) { console.warn('【ぐるり協賛】' + m); });
+      if (/[?&]check=sponsors\b/.test(location.search)) (function (fn) { if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', fn); else fn(); })(function () {
+        var bar = document.createElement('div');
+        bar.setAttribute('role', 'alert');
+        bar.style.cssText = 'position:sticky;top:0;z-index:999;background:#FFF3CD;color:#5A4300;border-bottom:2px solid #E0B200;padding:12px 16px;font-size:14px;line-height:1.7';
+        bar.innerHTML = '<b>協賛の設定の確認</b><br>' + spIssues.map(spEsc).join('<br>');
+        document.body.insertBefore(bar, document.body.firstChild);
+      });
+    } else if (/[?&]check=sponsors\b/.test(location.search) && window.console) {
+      console.info('【ぐるり協賛】設定に問題はありません（応援の欄 ' + spAll.length + '社・協賛カード ' + spCards.length + '社／枠 ' + (max == null ? '?' : max) + '社' + (n == null ? '' : '・掲載店' + n + '軒') + '）');
+    }
   }
   function spActive(slot) { return slot === 'B' ? spCards.slice() : spAll.slice(); }
   // リンクに、ぐるりから来たことが分かる印を付ける（すでに utm_source があるときは、そのまま）
@@ -834,6 +850,28 @@
   }
   var cpBanner = document.getElementById('cp-banner');
   if (cpBanner) cpBanner.addEventListener('click', function () { showCouponShops(true); });
+  /* お店のカードのリンクが押された回数（2026-11-25・依頼 claude/ぐるりサイト開発依頼_お店へのリンクの計測_v1.md）
+     GA4 へ shop_link（shop_name：日本語の店名／link_type：map・instagram・web・phone・other）。協賛カードのリンクは数えない（sponsor_click のまま）。
+     リンクの動きは今のまま（beacon で送るので、移動を遅らせない） */
+  function shopLinkType(a) {
+    var u = String(a.getAttribute('href') || '');
+    if (a.classList.contains('map-link') || /^https?:\/\/(www\.)?(google\.[a-z.]+\/maps|maps\.google\.|maps\.app\.goo\.gl|goo\.gl\/maps)/i.test(u)) return 'map';
+    if (/^tel:/i.test(u)) return 'phone';
+    if (/^https?:\/\/(www\.)?instagram\.com/i.test(u)) return 'instagram';
+    if (/^https?:\/\//i.test(u)) return 'web';
+    return 'other';
+  }
+  function shopLinkTrack(e) {
+    if (e.type === 'auxclick' && e.button !== 1) return;
+    var a = e.target.closest ? e.target.closest('a[href]') : null;
+    if (!a) return;
+    var c = a.closest('.card[data-shop-i]');
+    if (!c || !(c.querySelector('.links') && c.querySelector('.links').contains(a)) && !a.classList.contains('map-link')) return;
+    var s = shops[Number(c.getAttribute('data-shop-i'))];
+    if (!s) return;
+    try { if (typeof gtag === 'function') gtag('event', 'shop_link', { shop_name: s.name, link_type: shopLinkType(a), transport_type: 'beacon' }); } catch (x) {}
+  }
+  if (grid) { grid.addEventListener('click', shopLinkTrack); grid.addEventListener('auxclick', shopLinkTrack); }
   if (grid) grid.addEventListener('click', function (e) {
     var b = e.target.closest('[data-coupon]'); if (b) openCoupon(Number(b.getAttribute('data-coupon')));
     var sb = e.target.closest('[data-share]'); if (sb) shareShop(shops[Number(sb.getAttribute('data-share'))]);
@@ -980,6 +1018,7 @@
   primary.catch(function () { return load('data/shops.csv'); })
     .then(function (text) {
       shops = toShops(parseCSV(text));
+      spApplyCap(shops.filter(function (x) { return x.name; }).length);
       document.getElementById('shop-loading').hidden = true;
       render();
       startHero();
@@ -989,6 +1028,7 @@
       if (location.hash === '#coupons' && shops.some(function (s) { return s.coupon && shownInLang(s); })) showCouponShops(false);
     })
     .catch(function () {
+      spApplyCap(0);
       var ld = document.getElementById('shop-loading'); ld.setAttribute('data-i18n', 'error'); ld.textContent = T('error');
     });
 })();

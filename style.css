@@ -246,6 +246,8 @@ html[lang="zh-Hant"]{--maru:'PingFang TC','Noto Sans TC','Microsoft JhengHei',sa
 .pp-doc table{width:100%;min-width:560px;border-collapse:collapse;font-size:14px;line-height:1.8}
 .pp-doc th,.pp-doc td{border:1px solid #E6DCCF;padding:10px 12px;text-align:left;vertical-align:top}
 .pp-doc th{background:var(--kinari);font-weight:700}
+/* スマホでは表を1行ずつのカードにして、横にはみ出さないように（2026-11-25） */
+@media (max-width:640px){.pp-doc .pp-table{overflow:visible}.pp-doc .pp-table table,.pp-doc .pp-table tbody,.pp-doc .pp-table tr,.pp-doc .pp-table td{display:block;width:auto;min-width:0}.pp-doc .pp-table thead{position:absolute;width:1px;height:1px;overflow:hidden;clip:rect(0 0 0 0)}.pp-doc .pp-table tr{border:1px solid #E6DCCF;border-radius:12px;padding:4px 14px;margin:0 0 12px;background:#fff}.pp-doc .pp-table td{border:0;padding:8px 0;border-bottom:1px dashed #EFE3D0}.pp-doc .pp-table td:last-child{border-bottom:0}.pp-doc .pp-table td::before{content:attr(data-label);display:block;font-size:.8em;font-weight:700;color:#9C4A2A;margin-bottom:2px}}
 @media (max-width:720px){.pp{padding:36px 16px 72px}.pp-doc{padding:28px 20px 24px;font-size:15px}.pp-doc .pp-title{font-size:22px}.pp-doc h2{font-size:18px;margin-top:36px}}
 
 
@@ -516,6 +518,8 @@ html.sh-open{overflow:hidden}
 .jfee-ic{width:36px;height:36px;border-radius:50%;display:grid;place-items:center;background:var(--mint);color:#3F7A33}
 .jfee-ic svg{width:22px;height:22px}
 .jfee p{font-size:16px;line-height:2}
+.jfee-ord{margin-top:16px}
+.jfee-ord .jfee-ic{background:#F2DDD0;color:#9C4A2A}
 /* 申し込み */
 .jn-cta{padding-top:8px}
 .jn-cta h2{margin-bottom:26px}
