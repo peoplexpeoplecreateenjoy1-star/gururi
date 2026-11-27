@@ -199,11 +199,43 @@
     ready(function () { DECOR[name](); });
   }
 
+  /* ───── GA4：どの季節のデザインのときに見られたか（2026-11-28・ラテさんの提案） ─────
+     季節のデザインの良し悪しは、閲覧数よりも「どれだけ長く見てもらえたか」「どこまで見てもらえたか」で比べる。
+     ・season_design（飾りの id。飾りなしは none）を、このあとのすべてのイベントに付ける（gtag の set）。
+       GA4 が自動で数えている閲覧時間（エンゲージメント時間）も、この値で分けて見られる。
+     ・season_view：飾りが決まったときに1回。確認用の ?season=… で開いたときは season_preview=1（運営の確認と分けるため）。
+     ・scroll_depth：ページの25%・50%・75%・100%まで見たとき、それぞれ1回（percent）。 */
+  var seasonNow = 'none';
+  function report(name, preview) {
+    seasonNow = name && DECOR[name] ? name : 'none';
+    try {
+      if (typeof window.gtag !== 'function') return;
+      window.gtag('set', { season_design: seasonNow });
+      window.gtag('event', 'season_view', { season_design: seasonNow, season_preview: preview ? 1 : 0 });
+    } catch (e) {}
+  }
+  (function scrollDepth() {
+    var marks = [25, 50, 75, 100], sent = {};
+    function check() {
+      var h = document.documentElement, max = h.scrollHeight - window.innerHeight;
+      if (max < 200) return;
+      var p = Math.round((window.scrollY || h.scrollTop) / max * 100);
+      marks.forEach(function (m) {
+        if (p >= m && !sent[m]) {
+          sent[m] = 1;
+          try { if (typeof window.gtag === 'function') window.gtag('event', 'scroll_depth', { percent: m, season_design: seasonNow }); } catch (e) {}
+        }
+      });
+    }
+    var t = null;
+    window.addEventListener('scroll', function () { if (!t) t = setTimeout(function () { t = null; check(); }, 400); }, { passive: true });
+  })();
+
   var q = location.search.match(/[?&]season=([a-z0-9-]+)/i);
   var fixed = q ? q[1].toLowerCase() : String(CFG.season || 'auto').toLowerCase();
-  if (fixed !== 'auto') { apply(fixed); return; }
+  if (fixed !== 'auto') { apply(fixed); report(fixed, !!q); return; }
   fetch('seasons.csv', { cache: 'no-cache' })
     .then(function (r) { if (!r.ok) throw new Error(r.status); return r.text(); })
-    .then(function (t) { apply(pickFromCsv(t)); })
-    .catch(function () { /* 予定表が読めないときは、飾りなし（いつものサイトのまま） */ });
+    .then(function (t) { var n = pickFromCsv(t); apply(n); report(n, false); })
+    .catch(function () { report('none', false); /* 予定表が読めないときは、飾りなし（いつものサイトのまま） */ });
 })();
