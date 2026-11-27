@@ -766,3 +766,39 @@ a.spt-in:hover{border-color:var(--terra);color:var(--ink)}
 .cp-banner-t small{white-space:nowrap}
 @media (max-width:400px){.cp-banner-t small{font-size:12px;letter-spacing:0}}
 @media (max-width:340px){.cp-banner{padding:12px 12px;gap:10px}.cp-banner-ic{width:28px;height:28px}.cp-banner-t small{font-size:11px}}
+
+/* 検索エンジン向け（2026-11-28）：見出し（h1）の小さな一行と、フッターの「お店をさがす」案内 */
+.hero-copy h1{display:flex;flex-direction:column;align-items:center;gap:.25em}
+.hero-copy h1 .h1-kicker{font-size:max(11px,.34em);font-weight:700;letter-spacing:.06em;color:var(--terra-dk);line-height:1.4}
+.hero-copy h1 .h1-copy{display:block}
+@media (max-width:720px){.hero-copy h1 .h1-kicker{font-size:10.5px;letter-spacing:.03em}}
+.ft-find{max-width:1200px;margin:36px auto 0;padding-top:28px;border-top:1px solid rgba(217,205,190,.25)}
+.ft-find h2{font-size:17px;line-height:1.6;letter-spacing:.06em;margin:0 0 10px;color:#fff}
+.ft-find-p{font-size:13px;line-height:1.9;color:#D9CDBE;margin:0 0 24px;max-width:46em}
+.ft-cols{display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:24px 40px}
+.ft-cols h3{font-size:13px;letter-spacing:.08em;color:#fff;margin:0 0 10px}
+.ft-cols ul{list-style:none;margin:0;padding:0;display:flex;flex-wrap:wrap;gap:6px 14px;font-size:13px;line-height:1.7}
+.ft-cols a{color:#D9CDBE;text-decoration:none;border-bottom:1px solid transparent}
+.ft-cols a:hover,.ft-cols a:focus-visible{color:#fff;border-bottom-color:currentColor}
+.ft-words,.ft-shops{grid-column:1/-1}
+@media (max-width:720px){.ft-find h2{font-size:15px}.ft-cols{gap:20px}.ft-cols ul{gap:4px 12px}}
+
+/* フッターのお店さがし：ことば・お店の名前は、押すと開く（2026-11-28・A案） */
+.ft-find h2{font-size:15px}
+.ft-find > .ft-cols{gap:16px 40px}
+.ft-more{margin-top:18px}
+.ft-more summary{display:inline-flex;align-items:center;gap:8px;min-height:44px;cursor:pointer;list-style:none;font-size:13px;font-weight:700;color:#fff;letter-spacing:.04em}
+.ft-more summary::-webkit-details-marker{display:none}
+.ft-more summary::after{content:"";width:8px;height:8px;border-right:2px solid currentColor;border-bottom:2px solid currentColor;transform:rotate(45deg);margin-top:-4px;transition:transform .2s}
+.ft-more[open] summary::after{transform:rotate(-135deg);margin-top:4px}
+.ft-more .ft-find-p{margin:8px 0 18px}
+.ft-more .ft-cols{gap:18px 40px}
+.ft-find .ft-words,.ft-find .ft-shops{grid-column:1/-1}
+@media (max-width:720px){.ft-find{margin-top:28px;padding-top:22px}.ft-find h2{font-size:14px}}
+
+/* フッターの Instagram（2026-11-28） */
+.ft-ig{display:inline-flex;align-items:center;gap:10px;min-height:44px;color:var(--kinari);font-size:13px;letter-spacing:.04em;text-decoration:none}
+.ft-ig img{width:28px;height:28px;border-radius:8px;flex:none}
+.ft-ig:hover span,.ft-ig:focus-visible span{text-decoration:underline}
+@media (min-width:721px){.ft-in{align-items:center}.ft-ig{order:3}}
+@media (max-width:720px){.ft-ig{margin-top:-4px}}

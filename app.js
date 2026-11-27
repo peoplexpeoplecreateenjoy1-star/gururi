@@ -776,6 +776,40 @@
     }, 1500);
   }
 
+  /* 検索エンジン向け（2026-11-28）：
+     1) フッターの「掲載中のお店」を、いまのお店の一覧に入れかえる（新しいお店も自動で入る）
+     2) お店の一覧を、構造化データ（schema.org の ItemList）としてページに入れる */
+  function seoAfterLoad() {
+    var all = shops.filter(function (s) { return s.name; });
+    if (!all.length) return;
+    var base = location.origin + location.pathname.replace(/[^\/]*$/, '');
+    var ul = document.getElementById('ft-shop-list');
+    if (ul) ul.innerHTML = all.map(function (s) {
+      var n = s.name.replace(/\s*\n\s*/g, ' ');
+      return '<li><a href="index.html?shop=' + encodeURIComponent(n) + '">' + esc(n) + '</a></li>';
+    }).join('');
+    try {
+      var ld = {
+        '@context': 'https://schema.org', '@type': 'ItemList',
+        name: 'ぐるり ひばりヶ丘に掲載中のお店（ひばりヶ丘・西東京市・新座市）',
+        numberOfItems: all.length,
+        itemListElement: all.map(function (s, i) {
+          var n = s.name.replace(/\s*\n\s*/g, ' ');
+          var item = { '@type': 'LocalBusiness', name: n, url: base + 'index.html?shop=' + encodeURIComponent(n), description: String(s.text || '').replace(/\s+/g, ' ').slice(0, 160) };
+          var addr = (s.info || []).filter(function (l) { return /[都道府県市区町村]/.test(l) && /\d/.test(l) && !/営業|定休|時間/.test(l); })[0];
+          item.address = { '@type': 'PostalAddress', addressLocality: s.city || '', addressRegion: /新座/.test(s.city) ? '埼玉県' : '東京都', addressCountry: 'JP' };
+          if (addr) item.address.streetAddress = addr.replace(/^〒?\s*\d{3}-?\d{4}\s*/, '');
+          if (s.photos && s.photos[0]) { var ps = photoSrc(s.photos[0]); item.image = /^https?:/.test(ps) ? ps : base + ps; }
+          return { '@type': 'ListItem', position: i + 1, item: item };
+        })
+      };
+      var sc = document.createElement('script'); sc.type = 'application/ld+json'; sc.id = 'ld-shops';
+      sc.textContent = JSON.stringify(ld);
+      var old = document.getElementById('ld-shops'); if (old) old.remove();
+      document.head.appendChild(sc);
+    } catch (e) {}
+  }
+
   /* 検索の点検（URLの末尾に ?check=search）：試す言葉の一覧（search.js の TESTS）と、お店ごとの名前・よみで探して、
      出るべきお店が出るかを確かめる。よみの表にない漢字の一覧も出す。結果は画面と window.__gururiSearchReport に */
   function runSearchCheck() {
@@ -830,7 +864,13 @@
   // 検索窓：入力するたびに少し待ってから絞り込む。×で消す。?q=… でも開ける
   var qIn = document.getElementById('shop-q'), qX = document.getElementById('shop-q-x'), qTimer = null;
   if (qIn) {
-    try { var q0 = new URLSearchParams(location.search).get('q'); if (q0) { qIn.value = q0; state.q = q0; } } catch (e) {}
+    try {
+      var up0 = new URLSearchParams(location.search), q0 = up0.get('q');
+      if (q0) { qIn.value = q0; state.q = q0; }
+      // フッターの「ジャンルから」「まちから」のリンク（?genre=…・?area=…）
+      if (up0.get('genre')) state.genre = up0.get('genre');
+      if (up0.get('area')) state.area = up0.get('area');
+    } catch (e) {}
     var sync = function () { if (qX) qX.hidden = !qIn.value; };
     sync();
     qIn.addEventListener('input', function () {
@@ -1197,7 +1237,8 @@
     var name;
     try { name = new URLSearchParams(location.search).get('shop'); } catch (e) { return; }
     if (!name) return;
-    var i = shops.findIndex(function (s) { return s.name === name; });
+    var nk = function (t) { return String(t).replace(/\s+/g, ''); };
+    var i = shops.findIndex(function (s) { return s.name === name || nk(s.name) === nk(name); });
     try { var q = new URLSearchParams(location.search); q.delete('shop'); var rest = q.toString(); history.replaceState(null, '', location.pathname + (rest ? '?' + rest : '') + location.hash); } catch (e) {}
     if (i < 0) return;
     state.genre = 'all'; state.area = 'all'; state.coupon = false;
@@ -1215,7 +1256,8 @@
     var m = location.hash.match(/^#coupon=(.+)$/);
     if (!m) return closeCoupon(true);
     var name = decodeURIComponent(m[1]);
-    var i = shops.findIndex(function (s) { return s.name === name; });
+    var nk = function (t) { return String(t).replace(/\s+/g, ''); };
+    var i = shops.findIndex(function (s) { return s.name === name || nk(s.name) === nk(name); });
     if (i >= 0) openCoupon(i, true);
   });
   // #coupon=店名 のリンクで開いたとき（お店の一覧が読み込まれてから開く）
@@ -1233,7 +1275,8 @@
   function openCouponFromHash() {
     var m = location.hash.match(/^#coupon=(.+)$/); if (!m) return;
     var name = decodeURIComponent(m[1]);
-    var i = shops.findIndex(function (s) { return s.name === name; });
+    var nk = function (t) { return String(t).replace(/\s+/g, ''); };
+    var i = shops.findIndex(function (s) { return s.name === name || nk(s.name) === nk(name); });
     if (i >= 0) openCoupon(i, true);
   }
   // 言語を切り替えたら、開いているクーポン画面もその言語にする
@@ -1253,6 +1296,7 @@
     .then(function (text) {
       shops = toShops(parseCSV(text));
       if (/[?&]check=search\b/.test(location.search)) setTimeout(runSearchCheck, 300);
+      seoAfterLoad();
       spApplyCap(shops.filter(function (x) { return x.name; }).length);
       document.getElementById('shop-loading').hidden = true;
       render();
