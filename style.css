@@ -731,3 +731,38 @@ a.spt-in:hover{border-color:var(--terra);color:var(--ink)}
 .scope-bar.is-widened{border-color:#5E9A4E;background:#EEF4EA;color:var(--ink)}
 .scope-bar.is-widened .scope-x{border-color:var(--ink);color:var(--ink)}
 .empty .empty-scope{margin:-4px auto 14px;font-size:14px;color:var(--terra-dk);font-weight:700}
+
+/* 2026-11-27 G指示：余白と、クーポンのスイッチを1行に */
+.shops{padding-top:28px;padding-bottom:56px}
+.cp-banner{margin-bottom:24px}
+.cp-banner-t small{line-height:1.5}
+.cp-banner-t small{font-size:12.5px;letter-spacing:.02em;word-break:keep-all;overflow-wrap:anywhere}
+.cp-banner-t small.cp-banner-go-t{font-size:12px;opacity:.85}
+.grid:empty{display:none}
+.more-wrap:has(> [hidden]){display:none}
+.empty{margin-top:4px}
+#shop-scope2{margin-bottom:20px}
+.chip-coupon{white-space:nowrap;letter-spacing:.02em;max-width:100%}
+.chip-coupon .sw{flex:none;white-space:nowrap}
+@media (max-width:720px){
+  .shops{padding-top:20px;padding-bottom:28px}
+  .band-ig{padding-top:24px}
+  .cp-banner{padding:14px 16px;gap:12px}
+  .cp-banner{margin-bottom:20px}
+  .chip-coupon{gap:8px;padding-left:14px;font-size:13px}
+  .chip-coupon .sw{padding:3px 8px 3px 3px;font-size:12px}
+  .chip-coupon[aria-checked="true"] .sw{padding:3px 3px 3px 8px}
+}
+
+/* 2026-11-27 夕 G指示：見つからないときの案内に、ゆったりとした間を（詰めすぎない） */
+#shop-scope2{margin-bottom:36px}
+.empty .empty-msg{margin-bottom:22px;line-height:1.9}
+.empty .empty-all{margin-bottom:4px}
+.empty .empty-try{margin:40px 0 14px}
+.empty .empty-sug{gap:10px;max-width:520px;margin:0 auto}
+.cp-banner-t{gap:4px}
+
+/* 「割引やサービスなどが受け取れます」は、スマホでも1行に（2026-11-27 G指示） */
+.cp-banner-t small{white-space:nowrap}
+@media (max-width:400px){.cp-banner-t small{font-size:12px;letter-spacing:0}}
+@media (max-width:340px){.cp-banner{padding:12px 12px;gap:10px}.cp-banner-ic{width:28px;height:28px}.cp-banner-t small{font-size:11px}}

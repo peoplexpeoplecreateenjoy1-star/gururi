@@ -713,7 +713,7 @@
   // 検索窓のすぐ下と、一覧のすぐ上に「いまは〇〇の中から表示しています」＋「すべてのお店に戻す」。検索窓の中の案内の文字も変える
   function scopeBar(narrowed, more) {
     var label = narrowed ? scopeLabel() : '';
-    ['shop-scope', 'shop-scope2'].forEach(function (id) {
+    ['shop-scope2'].forEach(function (id) {
       var el = document.getElementById(id); if (!el) return;
       // 条件を外して、すべてのお店から出したとき：そのことと「〇〇だけに戻す」（検索窓のすぐ下と、一覧のすぐ上）
       el.classList.toggle('is-widened', !!widened);
@@ -749,7 +749,7 @@
     var lines = function (t) { return t.split(/(?<=。)/).map(esc).join('<br>'); };
     var html = q && wider
       ? '<p class="empty-msg">' + lines(T('search.wider', { f: lastScope, q: q, n: wider })) + '</p><button type="button" class="empty-all" data-all="1">' + esc(T('search.all')) + '</button>'
-      : '<p class="empty-msg">' + lines(q ? T('empty.q', { q: q }) : T('empty')) + '</p>' + (q && lastScope ? '<p class="empty-scope">' + esc(T('empty.scope', { f: lastScope })) + '</p>' : '');
+      : '<p class="empty-msg">' + lines(q ? T('empty.q', { q: q }) : T('empty')) + '</p>';
     var cand = (SUGGEST[I18N.lang] || SUGGEST.ja).filter(function (w) { return w !== q && searchShops(vis, w).list.length; }).slice(0, 8);
     if (q && cand.length) {
       html += '<p class="empty-try">' + esc(T('search.try')) + '</p><div class="empty-sug">' +
