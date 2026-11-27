@@ -332,31 +332,35 @@
 
   var state = { genre: 'all', area: 'all', q: '', coupon: false };
 
-  // キーワード検索：全角・半角、大文字・小文字、ひらがな・カタカナの違いは同じとみなす。空白で区切ると「すべてを含む」お店
-  function fold(t) {
-    return String(t || '').normalize('NFKC').toLowerCase()
-      .replace(/[\u30a1-\u30f6]/g, function (c) { return String.fromCharCode(c.charCodeAt(0) - 0x60); });
-  }
-  function words(q) { return fold(q).split(/[\s　]+/).filter(Boolean); }
+  // キーワード検索（2026-11-27 作り直し）：くわしいしくみは search.js。
+  // ひらがな・カタカナ・漢字・英語・カタカナ英語・ローマ字のどれでも、店名・紹介文・くわしい情報・訳の文から探す
+  var GS = window.GURURI_SEARCH;
+  function words(q) { return GS ? GS.words(q) : String(q || '').split(/\s+/).filter(Boolean); }
   function haystack(s) {
     if (s._hay) return s._hay;
-    var parts = [s.name, s.sub, s.kind, s.genre, s.city, s.text, s.info.join(' '), s.tag, s.abroadNote, s.coupon ? s.couponGift : ''];
+    var parts = [s.name, s.sub, s.kind, s.genre, s.city, s.text, s.info.join(' '), s.tag, s.abroadNote, s.coupon ? s.couponGift + ' クーポン coupon' : '', s.yomi];
     ['en', 'ko', 'zh'].forEach(function (lg) {
       var t = s.tr && s.tr[lg]; if (!t) return;
-      parts.push(t.name, t.sub, t.kind, t.text, t.info, t.abroadNote);
+      parts.push(t.name, t.sub, t.kind, t.text, t.info, t.abroadNote, t.couponGift);
     });
     // ジャンル・市・札・リンク名・お店の名前の訳（i18n.js）も、4つの言語で探せるようにする
     parts.push(W(s.genre), W(s.city), W(s.tag));
     if (I18N.allWords) parts.push(I18N.allWords([s.genre, s.city, s.tag]));
     if (I18N.allNames) parts.push(I18N.allNames(s.name));
     s.links.forEach(function (l) { parts.push(l.label); });
-    s._hay = fold(parts.filter(Boolean).join(' '));
+    s._hay = parts.filter(Boolean).join(' ');
     return s._hay;
   }
-  function matchQ(s, ws) {
-    if (!ws.length) return true;
-    var h = haystack(s);
-    return ws.every(function (w) { return h.indexOf(w) >= 0; });
+  function ensureIx(s) {
+    if (!s.ix && GS) s.ix = GS.makeIndex(haystack(s), GS.ALIAS[s.name.replace(/\s+/g, '')] || GS.ALIAS[s.name] || '');
+    return s;
+  }
+  // 探す：{ list, level }（level 1＝そのまま／2＝近い言葉で／3＝どれかの言葉で／0＝なし）
+  function searchShops(list, q) {
+    if (!words(q).length) return { list: list, level: 1 };
+    if (!GS) { var f = String(q).toLowerCase(); return { list: list.filter(function (s) { return haystack(s).toLowerCase().indexOf(f) >= 0; }), level: 1 }; }
+    list.forEach(ensureIx);
+    return GS.search(list, q);
   }
   var shops = [];
 
@@ -414,6 +418,8 @@
         name: col(r, '店名'), sub: col(r, 'サブ名'), genre: STYLE[genre] ? genre : '暮らし',
         kind: col(r, '種類'), city: col(r, '市'), text: col(r, '紹介文'),
         info: col(r, 'くわしい情報').split(/\n/).filter(Boolean), tag: col(r, 'タグ'),
+        // 検索だけに使う、よみがな・ほかの呼び方（シートに「よみがな」の列を足したときだけ。サイトには出ない）
+        yomi: col(r, 'よみがな') || col(r, '検索用のことば'),
         links: links,
         // 写真は1〜5枚。改行・カンマ・読点で区切って書く
         photos: col(r, '写真').split(/[\n,、，]+/).map(function (p) { return p.trim(); }).filter(Boolean),
@@ -574,9 +580,10 @@
     document.getElementById('area-chips').classList.toggle('chips-last', !show);
     el.classList.toggle('chips-last', show);
     if (!show) { el.innerHTML = ''; return; }
-    el.innerHTML = '<button type="button" class="chip chip-coupon" aria-pressed="' + (state.coupon ? 'true' : 'false') + '">' +
-      TICKET + '<span>' + esc(T('coupon.chip')) + '</span></button>';
-    el.firstChild.addEventListener('click', function () { state.coupon = !state.coupon; render(); });
+    // オン・オフがひと目で分かるスイッチの形（2026-11-27）。オンのときは色が付き「オン」、オフのときは白で「オフ」
+    el.innerHTML = '<button type="button" class="chip chip-coupon" role="switch" aria-checked="' + (state.coupon ? 'true' : 'false') + '">' +
+      TICKET + '<span>' + esc(T('coupon.only')) + '</span><span class="sw" aria-hidden="true"><i></i><b>' + esc(T(state.coupon ? 'sw.on' : 'sw.off')) + '</b></span></button>';
+    el.firstChild.addEventListener('click', function () { state.coupon = !state.coupon; widened = null; render(); });
   }
   // 上の「ぐるりクーポン」ボタン：クーポンありだけにして、お店のカードのところまでスクロールする
   function showCouponShops(smooth) {
@@ -644,11 +651,27 @@
     if (!anyCoupon) state.coupon = false;
     couponChip(anyCoupon);
     var ws = words(state.q);
-    var list = vis.filter(function (s) {
-      return (state.genre === 'all' || s.genre === state.genre) && (state.area === 'all' || s.city === state.area) &&
-        (!state.coupon || s.coupon) && matchQ(s, ws);
+    // 条件（クーポン・ジャンル・まち）で0軒になったときは、条件を外して、すべてのお店から出す（2026-11-27・お客様が「出てこない」で離れないように）
+    if (ws.length && !noWiden[state.q.trim()] && (state.genre !== 'all' || state.area !== 'all' || state.coupon)) {
+      var inF = searchShops(vis.filter(inFilter), state.q).list.length;
+      if (!inF && searchShops(vis, state.q).list.length) {
+        widened = { q: state.q.trim(), genre: state.genre, area: state.area, coupon: state.coupon, label: scopeLabel() };
+        state.genre = 'all'; state.area = 'all'; state.coupon = false;
+        chips(document.getElementById('genre-chips'), genres, 'genre', T('chip.all'), W);
+        chips(document.getElementById('area-chips'), cities, 'area', T('chip.allArea'), W);
+        couponChip(anyCoupon);
+      }
+    }
+    if (widened && (!ws.length || widened.q !== state.q.trim() || state.genre !== 'all' || state.area !== 'all' || state.coupon)) widened = null;
+    var filtered = vis.filter(function (s) {
+      return (state.genre === 'all' || s.genre === state.genre) && (state.area === 'all' || s.city === state.area) && (!state.coupon || s.coupon);
     });
-    list = orderShops(list);
+    var res = searchShops(filtered, state.q);
+    var list = orderShops(res.list);
+    // しぼり込みの中に見つからないとき、すべてのお店では何軒あるか
+    var wider = 0, narrowed = state.genre !== 'all' || state.area !== 'all' || state.coupon;
+    if (ws.length && !list.length && narrowed) wider = searchShops(vis, state.q).list.length;
+    lastScope = narrowed ? scopeLabel() : '';
     // 「もっと見る」：24枚ずつ。絞り込み・検索・言語が変わったら、最初の24枚に戻す
     var key = [I18N.lang, state.genre, state.area, state.coupon, state.q].join('|');
     if (key !== batchKey) { batchKey = key; batches = FIRST_BATCHES; }
@@ -665,9 +688,143 @@
     document.getElementById('shop-count').textContent = T('shops.count', { n: list.length, t: vis.length });
     var note = document.getElementById('mt-note');
     if (note) note.hidden = I18N.lang === 'ja';
+    var near = document.getElementById('shop-near');
+    if (near) { near.textContent = T('search.near', { q: state.q.trim() }); near.hidden = !(ws.length && list.length && res.level > 1); }
+    // 条件の中で見つかっても、条件の外にもあるときは、その数も添える
+    var more = 0;
+    if (ws.length && narrowed && list.length) more = Math.max(0, searchShops(vis, state.q).list.length - list.length);
+    scopeBar(narrowed, more);
     var empty = document.getElementById('shop-empty');
-    empty.textContent = ws.length ? T('empty.q', { q: state.q.trim() }) : T('empty');
     empty.hidden = list.length > 0;
+    if (!list.length) emptyBox(empty, ws.length ? state.q.trim() : '', wider, vis);
+    searchLog(state.q.trim(), list.length, res.level);
+  }
+
+  // いまの条件（クーポン・ジャンル・まち）を、言葉にする
+  var widened = null, noWiden = {}, lastScope = '';
+  function inFilter(s) { return (state.genre === 'all' || s.genre === state.genre) && (state.area === 'all' || s.city === state.area) && (!state.coupon || s.coupon); }
+  function scopeLabel() {
+    var f = [];
+    if (state.coupon) f.push(T('scope.coupon'));
+    if (state.genre !== 'all') f.push(W(state.genre));
+    if (state.area !== 'all') f.push(W(state.area));
+    return f.join(T('scope.sep'));
+  }
+  // 検索窓のすぐ下と、一覧のすぐ上に「いまは〇〇の中から表示しています」＋「すべてのお店に戻す」。検索窓の中の案内の文字も変える
+  function scopeBar(narrowed, more) {
+    var label = narrowed ? scopeLabel() : '';
+    ['shop-scope', 'shop-scope2'].forEach(function (id) {
+      var el = document.getElementById(id); if (!el) return;
+      // 条件を外して、すべてのお店から出したとき：そのことと「〇〇だけに戻す」（検索窓のすぐ下と、一覧のすぐ上）
+      el.classList.toggle('is-widened', !!widened);
+      if (widened) {
+        el.hidden = false;
+        el.innerHTML = '<span class="scope-t"><span>' + esc(T('search.widened', { f: widened.label, q: widened.q })) + '</span></span><button type="button" class="scope-x near-back">' + esc(T('search.back', { f: widened.label })) + '</button>';
+        return;
+      }
+      el.hidden = !label;
+      if (label) el.innerHTML = '<span class="scope-t">' + (state.coupon ? TICKET : '') + '<span>' + esc(T('scope.now', { f: label })) + (more ? '<br><small>' + esc(T('scope.more', { q: state.q.trim(), n: more })) + '</small>' : '') + '</span></span><button type="button" class="scope-x" data-scope-clear="1">' + esc(T('scope.clear')) + '</button>';
+    });
+    if (qIn) qIn.placeholder = state.coupon ? T('search.ph.coupon') : T('search.ph');
+  }
+  document.addEventListener('click', function (e) {
+    var t = e.target.closest && e.target.closest('[data-scope-clear],.near-back');
+    if (!t) return;
+    if (t.classList.contains('near-back') && widened) {
+      noWiden[widened.q] = 1;
+      state.genre = widened.genre; state.area = widened.area; state.coupon = widened.coupon; widened = null;
+    } else { state.genre = 'all'; state.area = 'all'; state.coupon = false; widened = null; }
+    render();
+  });
+
+  // 見つからないとき：前向きな一文と、いま探せる言葉の候補（押すとその言葉で探す）。しぼり込みの外にあるときは、その案内も
+  var SUGGEST = {
+    ja: ['カフェ', 'パン', 'お菓子', 'コーヒー', 'ランチ', '雑貨', 'ギフト', '教室', 'テイクアウト', '子ども', 'お花', '発酵', 'クーポン'],
+    en: ['cafe', 'bakery', 'sweets', 'coffee', 'lunch', 'gift', 'class', 'takeout', 'kids', 'flower'],
+    ko: ['카페', '빵', '과자', '커피', '점심', '선물', '교실', '꽃'],
+    zh: ['咖啡', '麵包', '甜點', '午餐', '禮物', '課程', '花']
+  };
+  function emptyBox(el, q, wider, vis) {
+    // 文ごとに改行（「。」のあと）して、読みやすく
+    var lines = function (t) { return t.split(/(?<=。)/).map(esc).join('<br>'); };
+    var html = q && wider
+      ? '<p class="empty-msg">' + lines(T('search.wider', { f: lastScope, q: q, n: wider })) + '</p><button type="button" class="empty-all" data-all="1">' + esc(T('search.all')) + '</button>'
+      : '<p class="empty-msg">' + lines(q ? T('empty.q', { q: q }) : T('empty')) + '</p>' + (q && lastScope ? '<p class="empty-scope">' + esc(T('empty.scope', { f: lastScope })) + '</p>' : '');
+    var cand = (SUGGEST[I18N.lang] || SUGGEST.ja).filter(function (w) { return w !== q && searchShops(vis, w).list.length; }).slice(0, 8);
+    if (q && cand.length) {
+      html += '<p class="empty-try">' + esc(T('search.try')) + '</p><div class="empty-sug">' +
+        cand.map(function (w) { return '<button type="button" class="chip" data-q="' + esc(w) + '">' + esc(w) + '</button>'; }).join('') + '</div>';
+    }
+    el.innerHTML = html;
+  }
+  document.addEventListener('click', function (e) {
+    var b = e.target.closest && e.target.closest('#shop-empty button');
+    if (!b) return;
+    if (b.getAttribute('data-all')) { state.genre = 'all'; state.area = 'all'; state.coupon = false; widened = null; render(); return; }
+    var w = b.getAttribute('data-q');
+    if (w && qIn) { qIn.value = w; state.q = w; state.genre = 'all'; state.area = 'all'; state.coupon = false; if (qX) qX.hidden = false; render(); try { if (typeof gtag === 'function') gtag('event', 'search_suggest', { search_term: w }); } catch (e2) {} }
+  });
+
+  // GA4：どんな言葉で探されたか（見つかった数・近い言葉で出したか）。打ち終わって少し待ってから1回だけ
+  var logTimer = null, lastLogged = '';
+  function searchLog(q, n, level) {
+    clearTimeout(logTimer);
+    if (!q) return;
+    logTimer = setTimeout(function () {
+      var key = q + '|' + n; if (key === lastLogged) return; lastLogged = key;
+      try { if (typeof gtag === 'function') gtag('event', 'search', { search_term: q.slice(0, 100), results: n, match_level: n ? level : 0 }); } catch (e) {}
+    }, 1500);
+  }
+
+  /* 検索の点検（URLの末尾に ?check=search）：試す言葉の一覧（search.js の TESTS）と、お店ごとの名前・よみで探して、
+     出るべきお店が出るかを確かめる。よみの表にない漢字の一覧も出す。結果は画面と window.__gururiSearchReport に */
+  function runSearchCheck() {
+    if (!GS) return;
+    var all = shops.filter(function (s) { return s.name; });
+    all.forEach(ensureIx);
+    var lines = [], bad = [], near = [], none = [], n = 0;
+    var short = function (s) { return s.name.replace(/\s+/g, ''); };
+    var test = function (q, expect, why) {
+      n++;
+      var r = GS.search(all, q), names = r.list.map(short);
+      var ok = !expect || names.some(function (x) { return x.indexOf(expect.replace(/\s+/g, '')) >= 0; });
+      var line = (ok ? (r.level > 1 ? '△' : (r.list.length ? '○' : '・')) : '×') + ' ' + q + '（' + r.list.length + '軒' + (r.level > 1 ? '・近い言葉で' : '') + '）' + (names.length ? '：' + names.slice(0, 5).join('、') + (names.length > 5 ? ' ほか' : '') : '') + (why ? '　［' + why + '］' : '');
+      lines.push(line);
+      if (!ok) bad.push(line); else if (r.level > 1) near.push(line); else if (!r.list.length) none.push(q);
+    };
+    GS.TESTS.forEach(function (t) { test(t[0], t[1], ''); });
+    all.forEach(function (s) {
+      var nm = short(s);
+      test(s.name.split(/\s+/)[0], nm, 'お店の名前');
+      String((GS.ALIAS[nm] || GS.ALIAS[s.name] || '') + ' ' + (s.yomi || '')).split(/[\s、,]+/).filter(Boolean).forEach(function (a) { test(a, nm, 'よみ・ほかの呼び方'); });
+      if (s.sub) test(s.sub, nm, 'サブ名');
+      if (s.kind) test(s.kind, nm, '種類');
+    });
+    var miss = {};
+    all.forEach(function (s) {
+      var m = GS.missingKanji([s.name, s.sub, s.kind, s.text, s.info.join(' '), s.tag, s.couponGift].join(' '));
+      Object.keys(m).forEach(function (k) { (miss[k] = miss[k] || []).indexOf(short(s)) < 0 && miss[k].push(short(s)); });
+    });
+    var noYomi = Object.keys(GS.ALIAS).length ? all.filter(function (s) { return /[A-Za-z]/.test(s.name) && !GS.ALIAS[short(s)] && !GS.ALIAS[s.name] && !s.yomi; }).map(short) : [];
+    var d = new Date(), stamp = d.getFullYear() + '/' + (d.getMonth() + 1) + '/' + d.getDate() + ' ' + d.getHours() + ':' + ('0' + d.getMinutes()).slice(-2);
+    var text = ['ぐるり ひばりヶ丘　検索の点検（' + stamp + '）', 'お店：' + all.length + '軒／試した言葉：' + n + '件',
+      '要対応（出るはずのお店が出ない）：' + bad.length + '件', '近い言葉で出したもの：' + near.length + '件', 'まだ当てはまるお店がない言葉：' + none.length + '件', '',
+      '■ 要対応', bad.length ? bad.join('\n') : 'なし', '',
+      '■ 英字の名前で、よみ（カタカナ・ひらがな）が登録されていないお店（search.js の ALIAS か、シートの「よみがな」の列に）', noYomi.length ? noYomi.join('、') : 'なし', '',
+      '■ よみの表にない漢字（search.js の YOMI に足す候補。言葉：出てくるお店）',
+      Object.keys(miss).length ? Object.keys(miss).map(function (k) { return k + '：' + miss[k].slice(0, 3).join('、'); }).join('\n') : 'なし', '',
+      '■ まだ当てはまるお店がない言葉', none.length ? none.join('、') : 'なし', '',
+      '■ すべての結果（○ そのまま見つかった／△ 近い言葉で／・ まだお店がない／× 要対応）', lines.join('\n')].join('\n');
+    // 点検のときだけ：好きな言葉で試せる（定期点検で、新しい言葉を試すため）。返り値 { n, level, shops }
+    window.__gururiTry = function (q) { var r = GS.search(all, q); return { n: r.list.length, level: r.level, shops: r.list.map(short) }; };
+    window.__gururiSearchReport = { text: text, bad: bad.length, near: near.length, none: none.length, tested: n, shops: all.length, missingKanji: Object.keys(miss).length, noYomi: noYomi };
+    var box = document.createElement('div');
+    box.className = 'sc-box';
+    box.innerHTML = '<div class="sc-head"><b>検索の点検</b><button type="button" class="sc-copy">結果をコピー</button><button type="button" class="sc-x" aria-label="閉じる">×</button></div><pre class="sc-pre"></pre>';
+    box.querySelector('.sc-pre').textContent = text;
+    box.querySelector('.sc-x').addEventListener('click', function () { box.remove(); });
+    box.querySelector('.sc-copy').addEventListener('click', function () { try { navigator.clipboard.writeText(text); this.textContent = 'コピーしました'; } catch (e) {} });
+    document.body.appendChild(box);
   }
 
   // 検索窓：入力するたびに少し待ってから絞り込む。×で消す。?q=… でも開ける
@@ -1095,6 +1252,7 @@
   primary.catch(function () { return load('data/shops.csv'); })
     .then(function (text) {
       shops = toShops(parseCSV(text));
+      if (/[?&]check=search\b/.test(location.search)) setTimeout(runSearchCheck, 300);
       spApplyCap(shops.filter(function (x) { return x.name; }).length);
       document.getElementById('shop-loading').hidden = true;
       render();

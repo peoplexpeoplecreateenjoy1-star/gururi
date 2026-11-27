@@ -94,6 +94,18 @@ p{margin:0}
 .links a{display:flex;align-items:center;justify-content:space-between;min-height:44px;text-decoration:none;font-weight:700;font-size:14px}
 .links svg{width:18px;height:18px}
 .empty,.loading{margin-top:24px;text-align:center;font-size:15px;color:var(--sub)}
+/* 検索：見つからないとき・近い言葉で出したとき（2026-11-27） */
+.empty .empty-msg{margin:0 auto 14px;max-width:34em;color:var(--ink);line-height:1.8;line-break:strict;text-wrap:pretty}
+.empty .empty-wider{margin:14px auto 8px;max-width:34em;line-height:1.7}
+.empty .empty-all{min-height:44px;padding:0 20px;border:2px solid var(--ink);border-radius:999px;background:#fff;color:var(--ink);font:inherit;font-weight:700;cursor:pointer}
+.empty .empty-try{margin:20px 0 10px;font-size:14px}
+.empty .empty-sug{display:flex;flex-wrap:wrap;justify-content:center;gap:8px}
+.search-near{margin:0 0 14px;font-size:14px;color:var(--sub)}
+.sc-box{position:fixed;inset:12px;z-index:9999;display:flex;flex-direction:column;background:#fff;border:2px solid #3A2A24;border-radius:12px;box-shadow:0 8px 30px rgba(0,0,0,.25)}
+.sc-head{display:flex;gap:8px;align-items:center;padding:10px 12px;border-bottom:1px solid #ddd}
+.sc-head b{flex:1}
+.sc-head button{min-height:36px;padding:0 12px;border:1px solid #3A2A24;border-radius:8px;background:#fff;font:inherit;cursor:pointer}
+.sc-pre{flex:1;margin:0;padding:12px;overflow:auto;white-space:pre-wrap;font-size:12px;line-height:1.6}
 
 /* bands */
 .band-ig{background:var(--mint);padding:56px 24px 72px;text-align:center}
@@ -699,3 +711,23 @@ a.spt-in:hover{border-color:var(--terra);color:var(--ink)}
 /* 帯があるときも、開いたときに「こんなお店、あったんだ。」が少し見えるよう、写真を帯の高さぶん低く */
 @media (max-width:720px){html.has-spt .tile{height:calc(31vw - 20px);height:clamp(90px,calc((100svh - 390px) / 3),37.5vw)}}
 @media (min-width:721px){html.has-spt .tile{height:clamp(140px,calc((100svh - 390px) / 2),min(25vw,320px))}}
+
+/* クーポンのスイッチと「いまは〇〇だけを表示しています」（2026-11-27） */
+.chip-coupon{gap:10px;padding-right:10px}
+.chip-coupon[aria-checked="false"]{border-color:#D6C8B4;background:#fff;color:var(--ink)}
+.chip-coupon[aria-checked="false"] svg{color:var(--terra)}
+.chip-coupon .sw{display:inline-flex;align-items:center;gap:6px;margin-left:4px;padding:3px 10px 3px 4px;border-radius:999px;background:#EFE6DA;color:#6B5A50;font-size:13px;letter-spacing:.04em}
+.chip-coupon .sw i{width:20px;height:20px;border-radius:50%;background:#fff;box-shadow:0 1px 2px rgba(0,0,0,.25)}
+.chip-coupon[aria-checked="true"]{border-color:var(--terra);background:var(--terra);color:#fff}
+.chip-coupon[aria-checked="true"] .sw{flex-direction:row-reverse;padding:3px 4px 3px 10px;background:#fff;color:var(--terra-dk)}
+.chip-coupon[aria-checked="true"] .sw i{background:var(--terra)}
+.scope-bar{display:flex;flex-wrap:wrap;align-items:center;gap:8px 12px;max-width:560px;margin:0 0 16px;padding:10px 12px 10px 14px;border:2px solid var(--terra);border-radius:14px;background:#FDF5EF;color:var(--terra-dk);font-size:14px;font-weight:700;line-height:1.6}
+.scope-bar[hidden]{display:none}
+.scope-bar .scope-t{flex:1 1 220px;display:flex;align-items:flex-start;gap:8px}
+.scope-bar .scope-t svg{width:20px;height:20px;flex:none;margin-top:2px}
+.scope-bar small{font-size:13px;font-weight:400;color:var(--ink)}
+.scope-x{min-height:40px;padding:0 14px;border:2px solid var(--terra-dk);border-radius:999px;background:#fff;color:var(--terra-dk);font:inherit;font-size:13px;cursor:pointer}
+#shop-scope2{max-width:none}
+.scope-bar.is-widened{border-color:#5E9A4E;background:#EEF4EA;color:var(--ink)}
+.scope-bar.is-widened .scope-x{border-color:var(--ink);color:var(--ink)}
+.empty .empty-scope{margin:-4px auto 14px;font-size:14px;color:var(--terra-dk);font-weight:700}
